@@ -44,8 +44,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","ISU DBMS",WS_VISIBLE|WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, /* x */
 		CW_USEDEFAULT, /* y */
-		640, /* width */
-		480, /* height */
+		1280, /* width */
+		720, /* height */
 		NULL,NULL,hInstance,NULL);
 
 	if(hwnd == NULL) {

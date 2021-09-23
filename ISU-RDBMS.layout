@@ -9,10 +9,21 @@
 	</File>
 </CodeBlocks_layout_file>
 [Editors]
-Order=0
-Focused=0
+Order=0,1
+Focused=1
 [Editor_0]
-CursorCol=57
-CursorRow=89
-TopLine=45
+<<<<<<< Updated upstream
+CursorCol=78
+CursorRow=157
+TopLine=133
+=======
+CursorCol=54
+CursorRow=24
+TopLine=1
+LeftChar=1
+[Editor_1]
+CursorCol=3
+CursorRow=13
+TopLine=1
+>>>>>>> Stashed changes
 LeftChar=1

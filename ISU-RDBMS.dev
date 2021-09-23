@@ -27,8 +27,8 @@ CommandLine=
 Folders=include,src
 IncludeVersionInfo=0
 SupportXPThemes=0
-CompilerSet=0
-CompilerSettings=0000000000000000000000000
+CompilerSet=1
+CompilerSettings=0000000000000000001000000
 UnitCount=2
 
 [VersionInfo]
@@ -60,8 +60,11 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
+[Unit3]
+FileName=table.h
+
 [Unit2]
-FileName=include\test.h
+FileName=include\table.h
 CompileCpp=1
 Folder=include
 Compile=1

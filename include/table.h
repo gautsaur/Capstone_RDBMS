@@ -1,5 +1,5 @@
 /* 
-*	File: 	   table.h
+*	File: 	    table.h
 *   Author:     Andrew Nunez
 *   Date:       Sept. 23, 2021
 *
@@ -12,23 +12,28 @@
 #include <vector>
 
 class Table {
-	public:
-		/// Table constructor
-		Table();
-		
+	public:		
 		/// The name of the table
-		string table_name;
+		std::string table_name;
 		
 		/// The name of the Database
-		string database_name;
+		std::string database_name;
 		
 		/// The collection of keys <type, value> of the table
-		std:map<string, string> keys;
+		std::map<std::string, std::string> keys;
 		
 		/// The collection of column names to a table
-		vector<string> column_names;
+		std::map<std::string, std::string> columns;
 		
 		/// The collection of arrays of rows for the table.
-		vector<vector<string>> rows;
+		std::vector<std::vector<std::string> > rows;
+		
+		void AddRow(std::vector<std::string> row) {
+			rows.push_back(row);
+		}
+		
+		Table(std::string name) {
+			table_name = name;
+		}
 		
 };

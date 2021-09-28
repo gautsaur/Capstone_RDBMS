@@ -32,8 +32,8 @@ void example_write()
 	// Insert the rows
 	std::vector<std::string> v1 = {1, "test 1"};
 	std::vector<std::string> v2 = {2, "test 2"};
-	tbl->AddRow(v1);
-	tbl->AddRow(v2);
+	tbl->Insert(v1);
+	tbl->Insert(v2);
 	
 	// Add the table to the database
 	db->AddTable(*tbl);

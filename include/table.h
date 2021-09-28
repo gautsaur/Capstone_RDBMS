@@ -28,10 +28,23 @@ class Table {
 		/// The collection of arrays of rows for the table.
 		std::vector<std::vector<std::string> > rows;
 		
-		void AddRow(std::vector<std::string> row) {
+		// TODO: Tie into user input
+		void Insert(std::vector<std::string> row) {
 			rows.push_back(row);
 		}
 		
+		// TODO: Tie into user input
+		void Delete() {
+			delete this;
+		}
+		
+		// TODO: Add column names
+		std::vector<std::vector<std::string> > Select(std::vector<std::string> col_names) {
+			return rows;
+		}
+		
+		// Use this as as create in DB CreateTable method
+		// TODO: Tie into user input
 		Table(std::string name) {
 			table_name = name;
 		}

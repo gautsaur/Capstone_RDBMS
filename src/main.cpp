@@ -1,113 +1,78 @@
-#include <windows.h>
+#include <fstream>
+#include "../include/database.h"
 
-#define FILE_MENU_NEW 1
-#define FILE_MENU_OPEN 2
-#define FILE_MENU_EXIT 3
-HMENU hmenu;
+/* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
-void AddMenu(HWND);
+void example_write();
+void example_read(std::string db_name);
 
-/* This is where all the input to the window goes to */
-LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	switch (Message)
-	{
-
-	case WM_COMMAND:
-		switch (wParam)
-		{
-			case FILE_MENU_EXIT:
-				DestroyWindow(hwnd);
-				break;
-
-			case FILE_MENU_NEW:
-				MessageBeep(MB_ICONINFORMATION);
-				break;
-			
-		}
-
-	case WM_CREATE:
-		AddMenu(hwnd);
-		break;
-
-	/* Upon destruction, tell the main thread to stop */
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-		break;
-	}
-
-	/* All other messages (a lot of them) are processed using default procedures */
-	default:
-		return DefWindowProc(hwnd, Message, wParam, lParam);
-	}
+int main(int argc, char** argv) {
+	
+	std::cout << "ISU RDBMS Project" << std::endl;
+	
+	example_write();
+	example_read("test");
+	
 	return 0;
 }
 
-/* The 'main' function of Win32 GUI programs: this is where execution starts */
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+void example_write()
 {
-	WNDCLASSEX wc; /* A properties struct of our window */
-	HWND hwnd;	   /* A 'HANDLE', hence the H, or a pointer to our window */
-	MSG msg;	   /* A temporary location for all messages */
-
-	/* zero out the struct and set the stuff we want to modify */
-	memset(&wc, 0, sizeof(wc));
-	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.lpfnWndProc = WndProc; /* This is where we will send messages to */
-	wc.hInstance = hInstance;
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-
-	/* White, COLOR_WINDOW is just a #define for a system color, try Ctrl+Clicking it */
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wc.lpszClassName = "WindowClass";
-	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);	  /* Load a standard icon */
-	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION); /* use the name "A" to use the project icon */
-
-	if (!RegisterClassEx(&wc))
-	{
-		MessageBox(NULL, "Window Registration Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
-		return 0;
+	// (create database) (test);
+	Database *db = new Database("test");
+	
+	// (create table) (test_table) (id int, name string)
+	Table *tbl = new Table("test_table");
+	
+	// Set the columns
+	tbl->columns.insert({"int", "id"});
+	tbl->columns.insert({"string", "name"});
+	
+	// insert into test_table (id, name) values((1, "test 1"), (2, "test 2"))
+	// Insert the rows
+	std::vector<std::string> v1 = {1, "test 1"};
+	std::vector<std::string> v2 = {2, "test 2"};
+	tbl->Insert(v1);
+	tbl->Insert(v2);
+	
+	// Add the table to the database
+	db->AddTable(*tbl);
+	
+	// open test
+	// File writing process
+	std::ofstream wf("data/" + db->database_name + ".bin", std::ios::out | std::ios::binary);
+	
+	if(!wf){
+		std::cout << "Cannot open file!" << std::endl;
 	}
-
-	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, "WindowClass", "ISU DBMS", WS_VISIBLE | WS_OVERLAPPEDWINDOW,
-						  CW_USEDEFAULT, /* x */
-						  CW_USEDEFAULT, /* y */
-						  1280,			 /* width */
-						  720,			 /* height */
-						  NULL, NULL, hInstance, NULL);
-
-	if (hwnd == NULL)
-	{
-		MessageBox(NULL, "Window Creation Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
-		return 0;
-	}
-
-	/*
-		This is the heart of our program where all input is processed and
-		sent to WndProc. Note that GetMessage blocks code flow until it receives something, so
-		this loop will not produce unreasonably high CPU usage
-	*/
-	while (GetMessage(&msg, NULL, 0, 0) > 0)
-	{							/* If no error is received... */
-		TranslateMessage(&msg); /* Translate key codes to chars if present */
-		DispatchMessage(&msg);	/* Send it to WndProc */
-	}
-	return msg.wParam;
+	
+	wf.write((char *) &db, sizeof(Database));
+	
+	if(!wf.good()) {
+      std::cout << "Error occurred at writing time!" << std::endl;
+   	}
+	
+	// Clean up
+	delete db;
+	delete tbl;
 }
 
-void AddMenu(HWND hWnd)
-{
-	hmenu = CreateMenu();
-	HMENU hFileMenu = CreateMenu();
-
-	AppendMenu(hFileMenu, MF_STRING, FILE_MENU_NEW, "New");
-	AppendMenu(hFileMenu, MF_STRING, FILE_MENU_OPEN, "Open");
-	AppendMenu(hFileMenu, MF_SEPARATOR, NULL, "NULL");
-	AppendMenu(hFileMenu, MF_STRING, FILE_MENU_EXIT, "Exit");
-
-	AppendMenu(hmenu, MF_POPUP, (UINT_PTR)hFileMenu, "File");
-	AppendMenu(hmenu, MF_STRING, NULL, "Help");
-
-	SetMenu(hWnd, hmenu);
+/// FYI, This is still not functioning yet. Still in progress.
+void example_read(std::string db_name) {
+	std::ifstream rf("data/" + db_name + ".bin", std::ios::out | std::ios::binary);
+   if(!rf) {
+      std::cout << "Cannot open file!" << std::endl;
+   }
+   
+   Database *db;
+   
+   rf.read((char *) &db, sizeof(Database));
+   
+   rf.close();
+   
+   if(!rf.good()) {
+      std::cout << "Error occurred at reading time!" << std::endl;
+   } else {
+   		std::cout << "Successfully Opened: " << db->database_name << std::endl;
+   }
 }

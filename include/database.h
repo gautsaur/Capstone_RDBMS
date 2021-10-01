@@ -6,7 +6,7 @@
 *   This file holds a class that defines a database and it's data to read and write from a .bin file.
 */
 
-#include "table.h";
+#include "table.h"
 
 class Database {
 	public:		

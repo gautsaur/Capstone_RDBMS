@@ -1,7 +1,7 @@
 [Project]
-FileName=ISU-RDBMS.dev
-Name=ISU-RDBMS
-Type=0
+FileName=Capstone_RDBMS.dev
+Name=Capstone_RDBMS
+Type=1
 Ver=2
 ObjFiles=
 Includes=
@@ -39,14 +39,14 @@ Build=0
 LanguageID=1033
 CharsetID=1252
 CompanyName=
-FileVersion=1.0.0.0
+FileVersion=
 FileDescription=Developed using the Dev-C++ IDE
 InternalName=
 LegalCopyright=
 LegalTrademarks=
 OriginalFilename=
 ProductName=
-ProductVersion=1.0.0.0
+ProductVersion=
 AutoIncBuildNr=0
 SyncProduct=1
 
@@ -61,7 +61,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit2]
-FileName=include\test.h
+FileName=include\table.h
 CompileCpp=1
 Folder=include
 Compile=1

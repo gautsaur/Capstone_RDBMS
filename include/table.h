@@ -1,5 +1,5 @@
 /* 
-*	File: 	   table.h
+*	File: 	    table.h
 *   Author:     Andrew Nunez
 *   Date:       Sept. 23, 2021
 *
@@ -12,23 +12,65 @@
 #include <vector>
 
 class Table {
-	public:
-		/// Table constructor
-		Table();
-		
+	public:		
 		/// The name of the table
-		string table_name;
+		std::string table_name;
 		
 		/// The name of the Database
-		string database_name;
+		std::string database_name;
 		
 		/// The collection of keys <type, value> of the table
-		std:map<string, string> keys;
+		std::map<std::string, std::string> keys;
 		
-		/// The collection of column names to a table
-		vector<string> column_names;
+		/// The collection of column names and types to a table
+		std::map<std::string, std::string> columns;
 		
 		/// The collection of arrays of rows for the table.
-		vector<vector<string>> rows;
+		std::vector<std::vector<std::string> > rows;
+		
+		void Insert(std::vector<std::string> row);
+		
+		void AddKey(std::string key, std::string value);
+		
+		// TODO: Add column names
+		std::vector<std::vector<std::string> > Select(std::vector<std::string> col_names);
+		
+		void Delete();
+		
+		Table() {
+			
+		}
+		
+		// Use this as as create in DB CreateTable method
+		// TODO: Tie into user input
+		Table(std::string name) {
+			table_name = name;
+		}
+		
+		~Table() {
+			
+		}
 		
 };
+
+void Table::AddKey(std::string key, std::string value) {
+	std::cout << "Adding: " << key << " " << value << std::endl;
+	
+	keys.insert(std::pair<std::string, std::string>(key, value));
+	
+}
+
+// TODO: Tie into user input
+void Table::Insert(std::vector<std::string> row) {
+	rows.push_back(row);
+}
+
+// TODO: Add column names
+std::vector<std::vector<std::string> > Table::Select(std::vector<std::string> col_names) {
+	return rows;
+}
+
+// TODO: Tie into user input
+void Table::Delete() {
+	delete this;
+}

@@ -1,3 +1,6 @@
 
 ISU-RDBMS.exe
 *.o
+*.exe
+Capstone_RDBMS.exe
+*.exe

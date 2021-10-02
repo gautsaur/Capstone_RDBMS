@@ -194,7 +194,7 @@ void Database::Read(std::string db_name) {
 		file.close();
 		
 	} else {
-		std::cout << "Unable to open file";
+		std::cout << "Database does no exist!" << std::endl;
 		
 	} 
 	

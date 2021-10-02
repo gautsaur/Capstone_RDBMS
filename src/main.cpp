@@ -29,10 +29,16 @@ int main(int argc, char** argv) {
 		color(7);
 		std::getline(std::cin, cmd);
 		
+		// SELECT [ID, TEST, ] FROM TABLE;
 		
 		// Do something with cmd
 		if(tolower(cmd.find("open database ") == 0)){
 			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+			Database *db = new Database(current_db_name);
+			
+			if(db->database_name != current_db_name){
+				current_db_name = "";
+			}
 			
 		} else if (to_lower(cmd) == "help") {
 			show_help();

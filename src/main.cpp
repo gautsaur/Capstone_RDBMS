@@ -42,7 +42,9 @@ int main(int argc, char** argv) {
 			
 		} else if (to_lower(cmd) == "help") {
 			show_help();
-		}else if (to_lower(cmd) == "exit"){
+		} else if (to_lower(cmd) == "list database") {
+			Database::List();
+		} else if (to_lower(cmd) == "exit"){
 			std::cout << "Good Bye" << std::endl;
 		} else {
 			std::cout << "Invalid Command." << std::endl;
@@ -75,9 +77,10 @@ void show_help() {
 	std::cout << "CREATE TABLE 		- Creates a table in the current database." << std::endl;
 	std::cout << "DROP DATABASE 		- Check if the database exists and open it." << std::endl; 
 	std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl; 
-	std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table" << std::endl; 
+	std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl; 
 	std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl; 
-	std::cout << "INSERT INTO 		- Inserts the data into the table" << std::endl; 
+	std::cout << "INSERT INTO 		- Inserts the data into the table." << std::endl; 
+	std::cout << "LIST DATABASE 		- Lists the current database names." << std::endl; 
 	
 }
 

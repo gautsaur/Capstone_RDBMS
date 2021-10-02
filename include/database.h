@@ -6,9 +6,8 @@
 *   This file holds a class that defines a database and it's data to read and write from a .bin file.
 */
 
-#include <fstream>
 #include <algorithm>
-#include <sstream>
+#include "filehelper.h"
 #include "table.h"
 
 class Database {
@@ -21,6 +20,8 @@ class Database {
 		
 		/// The collection of tables
 		std::vector<Table> tables;
+		
+		static void List();
 		
 		void AddTable(Table &tbl);
 		
@@ -188,6 +189,9 @@ void Database::Read(std::string db_name) {
 				delete tbl;
 				
 			}
+			else {
+				std::cout << "Database is Corrupt!" << std::endl;
+			}
 			
 		}
 		
@@ -197,5 +201,10 @@ void Database::Read(std::string db_name) {
 		std::cout << "Database does no exist!" << std::endl;
 		
 	} 
+	
+}
+
+void Database::List() {
+	FileHelper::listfiles("data", ".db");
 	
 }

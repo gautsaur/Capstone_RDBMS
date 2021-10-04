@@ -10,6 +10,7 @@ class FileHelper {
 	public:
 		void static listfiles(std::string dir, std::string ext);
 		std::string static readfile(std::string dir, std::string filename);
+		std::string static writefile(std::string contents, std::string filename, bool isbinary);
 
 };
 
@@ -41,4 +42,8 @@ void FileHelper::listfiles(std::string dir, std::string ext) {
 
 std::string FileHelper::readfile(std::string dir, std::string filename){
 	std::string ret = "";
+}
+
+std::string FileHelper::writefile(std::string contents, std::string filename, bool isbinary) {
+	
 }

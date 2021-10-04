@@ -1,8 +1,12 @@
-
-ISU-RDBMS.exe
 *.o
 *.exe
 Capstone_RDBMS.exe
 *.exe
 Capstone_RDBMS.exe
 Capstone_RDBMS.layout
+ISU-RDBMS.layout
+Capstone_RDBMS.dev
+LICENSE
+README.md
+Makefile.win
+.vs/

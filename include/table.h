@@ -74,23 +74,3 @@ std::vector<std::vector<std::string> > Table::Select(std::vector<std::string> co
 void Table::Delete() {
 	delete this;
 }
-	public:
-		/// Table constructor
-		Table();
-		
-		/// The name of the table
-		string table_name;
-		
-		/// The name of the Database
-		string database_name;
-		
-		/// The collection of keys <type, value> of the table
-		std:map<string, string> keys;
-		
-		/// The collection of column names to a table
-		vector<string> column_names;
-		
-		/// The collection of arrays of rows for the table.
-		vector<vector<string>> rows;
-		
-};

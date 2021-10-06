@@ -20,6 +20,10 @@ class Database {
 		
 		/// The collection of tables
 		std::vector<Table> tables;
+
+       
+
+		void Insert(std::vector<std::string> rows);
 		
 		static void List();
 		
@@ -30,6 +34,7 @@ class Database {
 		void Save();
 				
 		Database();
+
 		
 		// Use this a the create a DB
 		// TODO: Tie into user input
@@ -207,4 +212,9 @@ void Database::Read(std::string db_name) {
 void Database::List() {
 	FileHelper::listfiles("data", ".db");
 	
+}
+
+// TODO: Tie into user input
+void Database::Insert(std::vector<std::string> row) {
+	rows.push_back(row);
 }

@@ -1,4 +1,4 @@
-
+#include <iostream>
 #include "../include/database.h"
 #include <windows.h>
 #include <string>
@@ -6,38 +6,48 @@
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
-void example_write();
-void example_read(std::string db_name);
-Table* create_table(Database *db, std::string table_name);
 void color(int s);
 void setup_intro();
+void show_help();
 std::string to_lower(std::string str);
 HANDLE h = GetStdHandle( STD_OUTPUT_HANDLE );
 std::string current_db_name;
+Table* create_table(Database *db, std::string table_name);
 std::string table_name;
+
 
 int main(int argc, char** argv) {
 	std::string cmd;
-
+	
 	setup_intro();
-
+	
 	while(to_lower(cmd) != "exit") {
 		cmd = "";
-
+		
+		// Setup the command to wait for input
 		color(10);
-
 		if(current_db_name.length() > 0) {
 			std::cout << current_db_name << "@";
-		}
-
+		}		
 		std::cout << "SQL>";
 		color(7);
 		std::getline(std::cin, cmd);
-
+		
+		// SELECT [ID, TEST, ] FROM TABLE;
+		
 		// Do something with cmd
 		if(tolower(cmd.find("open database ") == 0)){
 			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-
+			Database *db = new Database(current_db_name);
+			
+			if(db->database_name != current_db_name){
+				current_db_name = "";
+			}
+			
+		} else if (to_lower(cmd) == "help") {
+			show_help();
+		} else if (to_lower(cmd) == "list database") {
+			Database::List();
 		} else if(tolower(cmd.find("create table ") == 0)){
 		    table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 
@@ -46,26 +56,42 @@ int main(int argc, char** argv) {
 		} else {
 			std::cout << "Invalid Command." << std::endl;
 		}
-
-		example_write();
-
+		
 	}
-
+	
 	//Database *db = new Database("test");
-
+	
 	//db->Save();
-
+			
 	return 0;
 }
 
-std::string to_lower(std::string s){
+/// Converts a string to lower
+std::string to_lower(std::string s){	
 	std::for_each(s.begin(), s.end(), [](char & c){
     	c = ::tolower(c);
 	});
-
-	return s;
+	
+	return s;	
 }
 
+/// Shows the help menu
+void show_help() {
+	std::cout << "Available Commands:" << std::endl;
+	std::cout << "OPEN DATABASE 		- Check if the database exists and open it." << std::endl;
+	std::cout << "CREATE DATABASE 	- Creates and new database and opens a connection to it." << std::endl; 
+	std::cout << "DROP DATABASE 		- Deletes the given database." << std::endl; 
+	std::cout << "CREATE TABLE 		- Creates a table in the current database." << std::endl;
+	std::cout << "DROP DATABASE 		- Check if the database exists and open it." << std::endl; 
+	std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl; 
+	std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl; 
+	std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl; 
+	std::cout << "INSERT INTO 		- Inserts the data into the table." << std::endl; 
+	std::cout << "LIST DATABASE 		- Lists the current database names." << std::endl; 
+	
+}
+
+/// Setups the intro, emulating a startup
 void setup_intro() {
 	std::cout << "ISU RDBMS Project" << std::endl;
 	std::cout << "Opening RDBMS Shell.";
@@ -79,60 +105,13 @@ void setup_intro() {
 	std::cout << ".";
 	Sleep(400);
 	std::cout << ".";
-
-	std::cout << std::endl << std::endl << "Success! Here is your shell. Type exit to quit." << std::endl << std::endl;
+	
+	std::cout << std::endl << std::endl << "Success! Here is your shell." << std::endl << "Type [help] for a list of commands. Type [exit]to quit." << std::endl << std::endl;
 }
 
+/// Sets the color of the output window
 void color( int s){
 	SetConsoleTextAttribute( h, s );
-}
-
-void example_write()
-{
-	// (create database) (test);
-	Database *db = new Database("test");
-
-	//std::string table_name = "test_Table";
-	Table *tbl = create_table(db, table_name);
-	std::cout << "Table Created! " << std::endl;
-
-	// open test
-	// File writing process
-	std::ofstream wf("data/" + db->database_name + ".bin", std::ios::out | std::ios::binary);
-
-	if(!wf){
-		std::cout << "Cannot open file!" << std::endl;
-	}
-
-	wf.write((char *) &db, sizeof(Database));
-
-	if(!wf.good()) {
-      std::cout << "Error occurred at writing time!" << std::endl;
-   	}
-
-	// Clean up
-	delete db;
-	delete tbl;
-}
-
-/// FYI, This is still not functioning yet. Still in progress.
-void example_read(std::string db_name) {
-	std::ifstream rf("data/" + db_name + ".bin", std::ios::out | std::ios::binary);
-   if(!rf) {
-      std::cout << "Cannot open file!" << std::endl;
-   }
-
-   Database *db;
-
-   rf.read((char *) &db, sizeof(Database));
-
-   rf.close();
-
-   if(!rf.good()) {
-      std::cout << "Error occurred at reading time!" << std::endl;
-   } else {
-   		std::cout << "Successfully Opened: " << db->database_name << std::endl;
-   }
 }
 
 Table* create_table(Database *db, std::string table_name){
@@ -154,16 +133,4 @@ Table* create_table(Database *db, std::string table_name){
 	db->AddTable(*tbl);
 
 	return tbl;
-
-
 }
-
-Database* create_db(Database *db, std::string database_name){
-    
-    Database *cr = new Database(database_name);
-    db->Save(*cr);
-
-	return cr;
-
-}
-

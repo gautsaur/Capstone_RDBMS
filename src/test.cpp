@@ -1,7 +1,26 @@
 #include <fstream>
+#include <regex>
 #include "../include/database.h"
 using namespace std;
 
+void check_command(string enteredCommand, string commandToCheck)
+{
+    if (enteredCommand.find(commandToCheck) != string::npos)
+    {
+        std::cout << "found!" << '\n';
+    }
+}
+
+void split_text(string input)
+{
+    std::regex re("[\\|,: ]");
+    std::sregex_token_iterator first{input.begin(), input.end(), re, -1}, last; //the '-1' is what makes the regex split (-1 := what was not matched)
+    std::vector<std::string> tokens{first, last};
+    for (auto t : tokens)
+    {
+        std::cout << t << std::endl;
+    }
+}
 
 void read_sql_file()
 {
@@ -11,14 +30,14 @@ void read_sql_file()
     { //checking whether the file is open
         string tp;
         while (getline(newfile, tp))
-        {                       //read data from file object and put it into string.
-            cout << tp << "\n"; //print the data of the string
+        {
+            split_text(tp); //print the data of the string
         }
         newfile.close(); //close the file object.
     }
 }
 
-
-int main(){
+int main()
+{
     read_sql_file();
 }

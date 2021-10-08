@@ -6,8 +6,6 @@
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
-void example_write();
-void example_read(std::string db_name);
 Table* create_table(Database *db, std::string table_name);
 void color(int s);
 void setup_intro();
@@ -118,54 +116,6 @@ void color( int s){
 	SetConsoleTextAttribute( h, s );
 }
 
-
-void example_write()
-{
-	// (create database) (test);
-	Database *db = new Database("test");
-
-	//std::string table_name = "test_Table";
-	Table *tbl = create_table(db, table_name);
-	std::cout << "Table Created! " << std::endl;
-
-	// open test
-	// File writing process
-	std::ofstream wf("data/" + db->database_name + ".bin", std::ios::out | std::ios::binary);
-
-	if(!wf){
-		std::cout << "Cannot open file!" << std::endl;
-	}
-
-	wf.write((char *) &db, sizeof(Database));
-
-	if(!wf.good()) {
-      std::cout << "Error occurred at writing time!" << std::endl;
-   	}
-
-	// Clean up
-	delete db;
-	delete tbl;
-}
-
-/// FYI, This is still not functioning yet. Still in progress.
-void example_read(std::string db_name) {
-	std::ifstream rf("data/" + db_name + ".bin", std::ios::out | std::ios::binary);
-   if(!rf) {
-      std::cout << "Cannot open file!" << std::endl;
-   }
-
-   Database *db;
-
-   rf.read((char *) &db, sizeof(Database));
-
-   rf.close();
-
-   if(!rf.good()) {
-      std::cout << "Error occurred at reading time!" << std::endl;
-   } else {
-   		std::cout << "Successfully Opened: " << db->database_name << std::endl;
-   }
-}
 
 
 Table* create_table(Database *db, std::string table_name, std::map<std::string, std::string> columns){

@@ -1,15 +1,4 @@
-<<<<<<< Updated upstream
-#include <iostream>
 
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
-
-int main(int argc, char** argv) {
-	
-	std::cout << "Hello World!";
-	
-	return 0;
-}
-=======
 #include "../include/database.h"
 #include <windows.h>
 #include <string>
@@ -35,29 +24,19 @@ int main(int argc, char** argv) {
 	while(to_lower(cmd) != "exit") {
 		cmd = "";
 
-<<<<<<< Updated upstream
-=======
 		// Setup the command to wait for input
->>>>>>> Stashed changes
 		color(10);
 
 		if(current_db_name.length() > 0) {
 			std::cout << current_db_name << "@";
 		}
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
+
 		std::cout << "SQL>";
 		color(7);
 		std::getline(std::cin, cmd);
 
-<<<<<<< Updated upstream
-		// Do something with cmd
-		if(tolower(cmd.find("open database ") == 0)){
-			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 
-=======
 		// SELECT [ID, TEST, ] FROM TABLE;
 
 		// Do something with cmd
@@ -73,7 +52,6 @@ int main(int argc, char** argv) {
 			show_help();
 		} else if (to_lower(cmd) == "list database") {
 			Database::List();
->>>>>>> Stashed changes
 		} else if(tolower(cmd.find("create table ") == 0)){
 		    table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		    //Table *tbl = new create_table(current_db_name, table_name, );
@@ -84,11 +62,6 @@ int main(int argc, char** argv) {
 			std::cout << "Invalid Command." << std::endl;
 		}
 
-<<<<<<< Updated upstream
-		example_write();
-
-=======
->>>>>>> Stashed changes
 	}
 
 	//Database *db = new Database("test");
@@ -98,18 +71,12 @@ int main(int argc, char** argv) {
 	return 0;
 }
 
-<<<<<<< Updated upstream
-=======
+
 /// Converts a string to lower
->>>>>>> Stashed changes
 std::string to_lower(std::string s){
 	std::for_each(s.begin(), s.end(), [](char & c){
     	c = ::tolower(c);
 	});
-<<<<<<< Updated upstream
-
-	return s;
-=======
 
 	return s;
 }
@@ -128,7 +95,6 @@ void show_help() {
 	std::cout << "INSERT INTO 		- Inserts the data into the table." << std::endl;
 	std::cout << "LIST DATABASE 		- Lists the current database names." << std::endl;
 
->>>>>>> Stashed changes
 }
 
 void setup_intro() {
@@ -145,18 +111,14 @@ void setup_intro() {
 	Sleep(400);
 	std::cout << ".";
 
-<<<<<<< Updated upstream
-	std::cout << std::endl << std::endl << "Success! Here is your shell. Type exit to quit." << std::endl << std::endl;
-=======
 	std::cout << std::endl << std::endl << "Success! Here is your shell." << std::endl << "Type [help] for a list of commands. Type [exit]to quit." << std::endl << std::endl;
->>>>>>> Stashed changes
 }
 
 void color( int s){
 	SetConsoleTextAttribute( h, s );
 }
 
-<<<<<<< Updated upstream
+
 void example_write()
 {
 	// (create database) (test);
@@ -205,10 +167,8 @@ void example_read(std::string db_name) {
    }
 }
 
-Table* create_table(Database *db, std::string table_name){
-=======
+
 Table* create_table(Database *db, std::string table_name, std::map<std::string, std::string> columns){
->>>>>>> Stashed changes
     // (create table) (test_table) (id int, name string)
     Table *tbl = new Table(table_name);
 
@@ -236,4 +196,3 @@ Table* create_table(Database *db, std::string table_name, std::map<std::string, 
 
 
 }
->>>>>>> Stashed changes

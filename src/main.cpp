@@ -14,6 +14,8 @@ HANDLE h = GetStdHandle( STD_OUTPUT_HANDLE );
 std::string current_db_name;
 Table* create_table(Database *db, std::string table_name);
 std::string table_name;
+Database* create_db(Database *db, std::string db_name);
+std::string db_name;
 
 
 int main(int argc, char** argv) {
@@ -51,6 +53,8 @@ int main(int argc, char** argv) {
 		} else if(tolower(cmd.find("create table ") == 0)){
 		    table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 
+		}else if(tolower(cmd.find("create database")==0)){
+            db_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		} else if (to_lower(cmd) == "exit"){
 			std::cout << "Good Bye" << std::endl;
 		} else {
@@ -133,4 +137,10 @@ Table* create_table(Database *db, std::string table_name){
 	db->AddTable(*tbl);
 
 	return tbl;
+}
+
+Database* create_db(Database *db, std::string db_name){
+	Database *cr = new Database(db_name);
+	db->Save();
+	return cr;
 }

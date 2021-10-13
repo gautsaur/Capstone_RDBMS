@@ -2,6 +2,7 @@
 #include <sstream>
 #include <dirent.h>
 #include <iostream>
+#include <cstring>
 
 class FileHelper {
 	private:

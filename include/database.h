@@ -214,7 +214,3 @@ void Database::List() {
 	
 }
 
-// TODO: Tie into user input
-void Database::Insert(std::vector<std::string> row) {
-	rows.push_back(row);
-}

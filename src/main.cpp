@@ -56,11 +56,11 @@ int main(int argc, char** argv) {
 			std::cout << "Good Bye" << std::endl;
 		} else if(tolower(cmd.find("create table ") == 0)){
 		    table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+		    //Table *tbl = new create_table(current_db_name, table_name, );
 
 		} else {
 			std::cout << "Invalid Command." << std::endl;
 		}
-		
 	}
 			
 	return 0;
@@ -119,13 +119,21 @@ void color( int s){
 	SetConsoleTextAttribute( h, s );
 }
 
-Table* create_table(Database *db, std::string table_name){
+
+
+Table* create_table(Database *db, std::string table_name, std::map<std::string, std::string> columns){
     // (create table) (test_table) (id int, name string)
     Table *tbl = new Table(table_name);
 
     // Set the columns
-    tbl->columns.insert({"int", "id"});
-	tbl->columns.insert({"string", "name"});
+    for(std::map<std::string, std::string>::iterator it = columns.begin(); it != columns.end(); ++it) {
+        std::string key = it->first;
+        std::string value = it->second;
+        tbl->columns.insert({key, value});
+    }
+
+    //tbl->columns.insert({"int", "id"});
+	//tbl->columns.insert({"string", "name"});
 
 	// insert into test_table (id, name) values((1, "test 1"), (2, "test 2"))
 	// Insert the rows

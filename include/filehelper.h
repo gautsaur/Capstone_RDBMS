@@ -1,6 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include <dirent.h>
+#include <string.h>
 #include <iostream>
 
 class FileHelper {

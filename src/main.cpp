@@ -39,6 +39,8 @@ int main(int argc, char** argv) {
 		color(7);
 		std::getline(std::cin, cmd);
 		
+		// SELECT [ID, TEST, ] FROM TABLE;
+		
 		// Do something with cmd
 		if(tolower(cmd.find("open database ") == 0)){
 			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);

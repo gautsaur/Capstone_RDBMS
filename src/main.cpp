@@ -9,6 +9,7 @@
 void color(int s);
 void setup_intro();
 void show_help();
+void print_rows(std::map<std::string, std::string> cols, std::vector<std::string, std::string> rows);
 std::string to_lower(std::string str);
 HANDLE h = GetStdHandle( STD_OUTPUT_HANDLE );
 std::string current_db_name;
@@ -48,20 +49,19 @@ int main(int argc, char** argv) {
 			show_help();
 		} else if (to_lower(cmd) == "list database") {
 			Database::List();
+		}  else if (tolower(cmd.find("select ") == 0)) {
+		 	
+		
+		}  else if (to_lower(cmd) == "exit"){
+			std::cout << "Good Bye" << std::endl;
 		} else if(tolower(cmd.find("create table ") == 0)){
 		    table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 
-		} else if (to_lower(cmd) == "exit"){
-			std::cout << "Good Bye" << std::endl;
 		} else {
 			std::cout << "Invalid Command." << std::endl;
 		}
 		
 	}
-	
-	//Database *db = new Database("test");
-	
-	//db->Save();
 			
 	return 0;
 }
@@ -75,10 +75,14 @@ std::string to_lower(std::string s){
 	return s;	
 }
 
+void print_rows(std::map<std::string, std::string> cols, std::vector<std::string, std::string> rows){
+	
+}
+
 /// Shows the help menu
 void show_help() {
 	std::cout << "Available Commands:" << std::endl;
-	std::cout << "OPEN DATABASE 		- Check if the database exists and open it." << std::endl;
+	std::cout << "OPEN DATABASE [name] 	- Check if the database exists and open it." << std::endl;
 	std::cout << "CREATE DATABASE 	- Creates and new database and opens a connection to it." << std::endl; 
 	std::cout << "DROP DATABASE 		- Deletes the given database." << std::endl; 
 	std::cout << "CREATE TABLE 		- Creates a table in the current database." << std::endl;
@@ -88,7 +92,8 @@ void show_help() {
 	std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl; 
 	std::cout << "INSERT INTO 		- Inserts the data into the table." << std::endl; 
 	std::cout << "LIST DATABASE 		- Lists the current database names." << std::endl; 
-	
+	// List Tables
+	// Display Schema
 }
 
 /// Setups the intro, emulating a startup

@@ -12,3 +12,5 @@ Makefile.win
 .vs/
 Capstone_RDBMS.dev
 *.o
+*.dev
+*.o

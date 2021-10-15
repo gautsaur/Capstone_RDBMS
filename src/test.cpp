@@ -13,9 +13,9 @@ void check_command(string enteredCommand, string commandToCheck)
 
 void split_text(string input)
 {
-    std::regex re("[\\|,: ]");
-    std::sregex_token_iterator first{input.begin(), input.end(), re, -1}, last; //the '-1' is what makes the regex split (-1 := what was not matched)
-    std::vector<std::string> tokens{first, last};
+    regex re("[\\|,: ]");
+    sregex_token_iterator first{input.begin(), input.end(), re, -1}, last; //the '-1' is what makes the regex split (-1 := what was not matched)
+    vector<std::string> tokens{first, last};
     for (auto t : tokens)
     {
         std::cout << t << std::endl;

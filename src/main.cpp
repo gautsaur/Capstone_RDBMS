@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <string>
 #include <stdlib.h>
+#include <regex>
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
@@ -11,16 +12,20 @@ void setup_intro();
 void show_help();
 void print_rows(std::map<std::string, std::string> cols, std::vector<std::string, std::string> rows);
 std::string to_lower(std::string str);
+void remove_char(std::string str, char delim);
 HANDLE h = GetStdHandle( STD_OUTPUT_HANDLE );
 std::string current_db_name;
 Table* create_table(Database *db, std::string table_name);
 std::string table_name;
+void print_rows(std::vector<std::vector<std::string> > rows);
 
 
 int main(int argc, char** argv) {
 	std::string cmd;
 	
 	setup_intro();
+	
+	Database *db;
 	
 	while(to_lower(cmd) != "exit") {
 		cmd = "";
@@ -34,12 +39,10 @@ int main(int argc, char** argv) {
 		color(7);
 		std::getline(std::cin, cmd);
 		
-		// SELECT [ID, TEST, ] FROM TABLE;
-		
 		// Do something with cmd
 		if(tolower(cmd.find("open database ") == 0)){
 			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-			Database *db = new Database(current_db_name);
+		 	db = new Database(current_db_name);
 			
 			if(db->database_name != current_db_name){
 				current_db_name = "";
@@ -50,6 +53,34 @@ int main(int argc, char** argv) {
 		} else if (to_lower(cmd) == "list database") {
 			Database::List();
 		}  else if (tolower(cmd.find("select ") == 0)) {
+			// Parses the select command
+			try	{
+				//std::regex rgx("[\n\r].* from \s*([^\n\r]*)");
+				//std::smatch match;
+				std::string stmt = to_lower(cmd);
+				
+				std::string tbl_name = stmt.substr(stmt.find("from ") + 5);
+				
+				remove_char(tbl_name, ';');
+				
+				auto tbl = find_if(db->tables.begin(), db->tables.end(), [&tbl_name](const Table& obj) {
+					return obj.table_name == tbl_name;
+				});
+				
+				//db->tables->
+				
+				//if(std::regex_search(stmt.begin(), stmt.end(), match, rgx)){
+					//std::string tbl_name = match[1];
+					
+					std::cout << "SELECT FROM: " << tbl_name << std::endl; 
+				//} else {
+					//cout << "Invalid Command!"; << endl;
+				//}
+				
+				
+			} catch(const std::exception&) {
+				
+			}
 		 	
 		
 		}  else if (to_lower(cmd) == "exit"){
@@ -73,6 +104,26 @@ std::string to_lower(std::string s){
 	});
 	
 	return s;	
+}
+
+void remove_char(std::string str, char delim){
+	int j = 0;
+	int len = str.length();
+
+    for (int i = 0; i < len; i++)
+    {
+        if (str[i] == delim)
+        {
+            continue;
+        }
+        else
+        {
+            str[j] = str[i];
+            j++;
+        }
+    }
+
+    str[j] = '\0';
 }
 
 void print_rows(std::map<std::string, std::string> cols, std::vector<std::string, std::string> rows){
@@ -119,7 +170,9 @@ void color( int s){
 	SetConsoleTextAttribute( h, s );
 }
 
-
+void print_rows(std::vector<std::vector<std::string> > rows) {
+	
+}
 
 Table* create_table(Database *db, std::string table_name, std::map<std::string, std::string> columns){
     // (create table) (test_table) (id int, name string)

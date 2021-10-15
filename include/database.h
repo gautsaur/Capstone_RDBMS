@@ -28,6 +28,8 @@ class Database {
 		void Delete();
 			
 		void Save();
+		
+		Table* get_table(std::string tbl_name);
 				
 		Database();
 		

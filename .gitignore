@@ -1,6 +1,8 @@
 *.o
 *.exe
 *.layout
+.vs/
+.vscode/
 Capstone_RDBMS.exe
 Capstone_RDBMS.layout
 ISU-RDBMS.layout

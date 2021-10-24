@@ -1,3 +1,5 @@
+CREATE DATABASE TestDBSaurav;
+
 CREATE TABLE Customers
 (
   CustomerName varchar(255),

@@ -206,5 +206,4 @@ void Database::Read(std::string db_name) {
 
 void Database::List() {
 	FileHelper::listfiles("data", ".db");
-	
 }

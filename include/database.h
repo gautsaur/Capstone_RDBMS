@@ -29,7 +29,7 @@ class Database {
 			
 		void Save();
 		
-		Table* get_table(std::string tbl_name);
+		Table get_table(std::string tbl_name);
 				
 		Database();
 		
@@ -200,7 +200,7 @@ void Database::Read(std::string db_name) {
 		file.close();
 		
 	} else {
-		std::cout << "Database does no exist!" << std::endl;
+		std::cout << "Database does not exist!" << std::endl;
 		
 	} 
 	
@@ -208,5 +208,20 @@ void Database::Read(std::string db_name) {
 
 void Database::List() {
 	FileHelper::listfiles("data", ".db");
+	
+}
+
+Table Database::get_table(std::string name){
+	Table ret;
+	
+	auto tbl = find_if(tables.begin(), tables.end(), [&name](const Table& obj) {
+		return obj.table_name == name;
+	});
+	
+	if(tbl != tables.end()) {
+		ret = *tbl;
+	}
+	
+	return ret;
 	
 }

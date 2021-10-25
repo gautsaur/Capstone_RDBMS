@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../include/database.h"
+#include "database.h"
 #include <windows.h>
 #include <string>
 #include <stdlib.h>
@@ -10,14 +10,13 @@
 void color(int s);
 void setup_intro();
 void show_help();
-void print_rows(std::map<std::string, std::string> cols, std::vector<std::string, std::string> rows);
+void print_rows(Table tbl);
 std::string to_lower(std::string str);
-void remove_char(std::string str, char delim);
+std::string remove_char(std::string str, char delim);
 HANDLE h = GetStdHandle( STD_OUTPUT_HANDLE );
 std::string current_db_name;
 Table* create_table(Database *db, std::string table_name);
 std::string table_name;
-void print_rows(std::vector<std::vector<std::string> > rows);
 
 
 int main(int argc, char** argv) {
@@ -26,7 +25,7 @@ int main(int argc, char** argv) {
 	setup_intro();
 	
 	Database *db;
-	
+			
 	while(to_lower(cmd) != "exit") {
 		cmd = "";
 		
@@ -39,10 +38,12 @@ int main(int argc, char** argv) {
 		color(7);
 		std::getline(std::cin, cmd);
 		
+		std::string statement = to_lower(cmd);
+		
 		// SELECT [ID, TEST, ] FROM TABLE;
 		
 		// Do something with cmd
-		if(tolower(cmd.find("open database ") == 0)){
+		if(statement.find("open database ") == 0){
 			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		 	db = new Database(current_db_name);
 			
@@ -50,45 +51,33 @@ int main(int argc, char** argv) {
 				current_db_name = "";
 			}
 			
-		} else if (to_lower(cmd) == "help") {
+		} else if (statement == "help") {
 			show_help();
-		} else if (to_lower(cmd) == "list database") {
+		} else if (statement == "list database") {
 			Database::List();
-		}  else if (tolower(cmd.find("select ") == 0)) {
+		}  else if (statement.find("select ") == 0) {
 			// Parses the select command
 			try	{
-				//std::regex rgx("[\n\r].* from \s*([^\n\r]*)");
-				//std::smatch match;
-				std::string stmt = to_lower(cmd);
 				
-				std::string tbl_name = stmt.substr(stmt.find("from ") + 5);
+				std::string tbl_name = statement.substr(statement.find(" from") + 6);
 				
-				remove_char(tbl_name, ';');
+				tbl_name = remove_char(tbl_name, ';');
 				
-				auto tbl = find_if(db->tables.begin(), db->tables.end(), [&tbl_name](const Table& obj) {
-					return obj.table_name == tbl_name;
-				});
+				Table tbl = db->get_table(tbl_name);
 				
-				//db->tables->
+				std::cout << tbl.table_name << std::endl;
 				
-				//if(std::regex_search(stmt.begin(), stmt.end(), match, rgx)){
-					//std::string tbl_name = match[1];
-					
-					std::cout << "SELECT FROM: " << tbl_name << std::endl; 
-				//} else {
-					//cout << "Invalid Command!"; << endl;
-				//}
-				
+				print_rows(tbl);
 				
 			} catch(const std::exception&) {
 				
 			}
 		 	
 		
-		}  else if (to_lower(cmd) == "exit"){
+		}  else if (statement == "exit"){
 			std::cout << "Good Bye" << std::endl;
-		} else if(tolower(cmd.find("create table ") == 0)){
-		    table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+		} else if(statement.find("create table ") == 0){
+		    table_name = statement.substr(cmd.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
 		    //Table *tbl = new create_table(current_db_name, table_name, );
 
 		} else {
@@ -108,27 +97,14 @@ std::string to_lower(std::string s){
 	return s;	
 }
 
-void remove_char(std::string str, char delim){
-	int j = 0;
-	int len = str.length();
-
-    for (int i = 0; i < len; i++)
-    {
-        if (str[i] == delim)
-        {
-            continue;
-        }
-        else
-        {
-            str[j] = str[i];
-            j++;
-        }
-    }
-
-    str[j] = '\0';
+std::string remove_char(std::string str, char delim){
+	str.erase(std::remove(str.begin(), str.end(), delim), str.end());
+	
+	return str;
+	
 }
 
-void print_rows(std::map<std::string, std::string> cols, std::vector<std::string, std::string> rows){
+void print_rows(Table tbl){
 	
 }
 
@@ -172,9 +148,6 @@ void color( int s){
 	SetConsoleTextAttribute( h, s );
 }
 
-void print_rows(std::vector<std::vector<std::string> > rows) {
-	
-}
 
 Table* create_table(Database *db, std::string table_name, std::map<std::string, std::string> columns){
     // (create table) (test_table) (id int, name string)

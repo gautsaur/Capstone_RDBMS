@@ -1,6 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include <dirent.h>
+#include <string.h>
 #include <iostream>
 #include <cstring>
 
@@ -32,6 +33,7 @@ void FileHelper::listfiles(std::string dir, std::string ext) {
 	
 	std::string str = "";
 	
+	// TODO: return string instead of output to console
 	while((dp = readdir(dirp)) != NULL) {
 				
 		if(FileHelper::CheckExtension(dp->d_name, ext)){
@@ -42,9 +44,23 @@ void FileHelper::listfiles(std::string dir, std::string ext) {
 }
 
 std::string FileHelper::readfile(std::string dir, std::string filename){
-	std::string ret = "";
+	std::string ret = "";	
+	std::ifstream file ("data/" + filename);
+	std::stringstream buffer;
+	
+	if (file.is_open()){
+		buffer << file.rdbuf();
+		ret = buffer.str();
+		
+		file.close();
+	}
+	
+	return ret;
 }
 
 std::string FileHelper::writefile(std::string contents, std::string filename, bool isbinary) {
-	
+	std::ofstream out(filename);
+		
+	out << contents;
+	out.close();
 }

@@ -5,6 +5,16 @@
 #include "../include/utils.h"
 using namespace std;
 
+class Parser {
+	public:
+		void check_command(string enteredCommand, string commandToCheck);	
+		void tokenize(std::string const &str, const char* delim, std::vector<std::string> &out);
+		string splitString(string str, string delimiter);
+		vector<string> split_text(string input);
+		void read_sql_file();
+		
+};
+
 void check_command(string enteredCommand, string commandToCheck)
 {
     if (enteredCommand.find(commandToCheck) != string::npos)

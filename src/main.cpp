@@ -104,8 +104,10 @@ std::string remove_char(std::string str, char delim){
 	
 }
 
-void print_rows(Table tbl){
-	
+void print_rows(Table *tbl){
+	//for(std::map<std::string, std::string> column : tbl.columns){
+	//	std::cout << column->first << " | " << std::endl;
+	//}
 }
 
 /// Shows the help menu

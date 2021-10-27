@@ -20,6 +20,10 @@ class Database {
 		
 		/// The collection of tables
 		std::vector<Table> tables;
+
+       
+
+		void Insert(std::vector<std::string> rows);
 		
 		static void List();
 		
@@ -32,6 +36,7 @@ class Database {
 		Table get_table(std::string tbl_name);
 				
 		Database();
+
 		
 		// Use this a the create a DB
 		// TODO: Tie into user input
@@ -224,3 +229,4 @@ Table Database::get_table(std::string name){
 	return ret;
 	
 }
+

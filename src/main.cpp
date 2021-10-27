@@ -17,6 +17,9 @@ HANDLE h = GetStdHandle( STD_OUTPUT_HANDLE );
 std::string current_db_name;
 Table* create_table(Database *db, std::string table_name);
 std::string table_name;
+Database* create_db(Database *db, std::string db_name);
+std::string db_name;
+Table insert_into(std::string table_name, std::map<std::string, std::string> columns);
 
 
 int main(int argc, char** argv) {
@@ -55,7 +58,8 @@ int main(int argc, char** argv) {
 			show_help();
 		} else if (statement == "list database") {
 			Database::List();
-		}  else if (statement.find("select ") == 0) {
+		}
+		  else if (tolower(cmd.find("select ") == 0)) {
 			// Parses the select command
 			try	{
 				
@@ -80,7 +84,12 @@ int main(int argc, char** argv) {
 		    table_name = statement.substr(cmd.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
 		    //Table *tbl = new create_table(current_db_name, table_name, );
 
-		} else {
+		} else if(tolower(cmd.find("create database")==0)){
+            db_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+		}else if(tolow
+		er(cmd.find("insert into")==0)){
+            table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+		}else {
 			std::cout << "Invalid Command." << std::endl;
 		}
 	}
@@ -176,4 +185,17 @@ Table* create_table(Database *db, std::string table_name, std::map<std::string, 
 	db->AddTable(*tbl);
 
 	return tbl;
+}
+
+Database* create_db(Database *db, std::string db_name){
+	Database *cr = new Database(db_name);
+	db->Save();
+	return cr;
+}
+
+Table insert_into(std::string table_name, std::map<std::string, std::string> columns){
+	
+    std::vector<std::string> v1
+	columns.Insert(v1);
+	return columns;
 }

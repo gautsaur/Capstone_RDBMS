@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <iostream>
+#include <cstring>
 
 class FileHelper {
 	private:

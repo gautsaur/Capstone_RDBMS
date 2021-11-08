@@ -31,35 +31,47 @@ int main(int argc, char** argv) {
 			
 	while(to_lower(cmd) != "exit") {
 		cmd = "";
-		
+				
 		// Setup the command to wait for input
 		color(10);
 		if(current_db_name.length() > 0) {
 			std::cout << current_db_name << "@";
-		}		
+		}
+			
 		std::cout << "SQL>";
 		color(7);
 		std::getline(std::cin, cmd);
-		
 		std::string statement = to_lower(cmd);
+		
 		
 		// SELECT [ID, TEST, ] FROM TABLE;
 		
 		// Do something with cmd
-		if(statement.find("open database ") == 0){
+		if (statement == "exit"){
+			std::cout << "Good Bye" << std::endl;
+		} else if (statement == "help") {
+			show_help();
+		
+		} else if(cmd.back() != ';') {
+			std::cout << "SQL command not properly terminated." << std::endl;
+		} else if(statement.find("open database ") == 0){
 			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		 	db = new Database(current_db_name);
 			
 			if(db->database_name != current_db_name){
 				current_db_name = "";
 			}
-			
-		} else if (statement == "help") {
-			show_help();
-		} else if (statement == "list database") {
+		
+		} else if (statement == "list database;") {
 			Database::List();
-		}
-		  else if (tolower(cmd.find("select ") == 0)) {
+		} else if (statement == "list tables;") {
+			if(current_db_name.length() == 0) {
+				std::cout << "Open a database first." << std::endl;
+			} else {
+				db->List_Tables();
+			}
+			
+		} else if (tolower(cmd.find("select ") == 0)) {
 			// Parses the select command
 			try	{
 				
@@ -68,27 +80,28 @@ int main(int argc, char** argv) {
 				tbl_name = remove_char(tbl_name, ';');
 				
 				Table tbl = db->get_table(tbl_name);
-				
-				std::cout << tbl.table_name << std::endl;
-				
-				print_rows(tbl);
+								
+				if(tbl.table_name.length() > 0){
+					std::vector<std::string> cols = Parser::get_select_columns(statement);
+					tbl.Print_Rows(cols);
+					
+				} else {
+					std::cout << "Table does not exist." << std::endl;
+				}
 				
 			} catch(const std::exception&) {
 				
 			}
-		 	
 		
-		}  else if (statement == "exit"){
-			std::cout << "Good Bye" << std::endl;
-		} else if(statement.find("create table ") == 0){
+		}  else if(statement.find("create table ") == 0){
 		    table_name = statement.substr(cmd.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
 		    //Table *tbl = new create_table(current_db_name, table_name, );
 
 		} else if(tolower(cmd.find("create database")==0)){
             db_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-		}else if(tolow
-		er(cmd.find("insert into")==0)){
+		}else if(tolower(cmd.find("insert into")==0)){
             table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+            
 		}else {
 			std::cout << "Invalid Command." << std::endl;
 		}
@@ -113,10 +126,61 @@ std::string remove_char(std::string str, char delim){
 	
 }
 
-void print_rows(Table *tbl){
-	//for(std::map<std::string, std::string> column : tbl.columns){
-	//	std::cout << column->first << " | " << std::endl;
-	//}
+void print_rows(Table tbl){
+	int row_count = 0;
+	int col_char_count = tbl.GetLargestColumnSize();
+	int row_char_count = (tbl.columns.size() * (col_char_count + 3)) + 1;
+
+	std::cout << "| ";
+
+	for (auto const& it : tbl.columns) {
+		std::cout << it.first;
+		
+		for(int i = 0; i < col_char_count - it.first.length(); i += 1) {
+			std::cout << " ";
+		}
+		
+		std::cout << " | ";
+		
+	}
+	
+	std::cout << std::endl;
+	
+	for(int i = 0; i < row_char_count; i += 1) {
+		std::cout << "=";
+	}
+	
+	std::cout << std::endl;
+	
+	
+	
+	for(std::vector<std::string> row : tbl.rows) {
+		std::cout << "| ";
+		
+		for(std::string &value : row){
+			std::cout << value;
+			
+			for(int i = 0; i < col_char_count - value.length(); i += 1) {
+				std::cout << " ";
+			}
+			
+			std::cout  << " | ";
+		
+		}
+				
+		std::cout << std::endl;
+		
+		for(int i = 0; i < row_char_count; i += 1) {
+			std::cout << "-";
+		}
+			
+		std::cout << std::endl;
+				
+		row_count += 1;
+	}
+		
+	std::cout << row_count << " rows selected." << std::endl;
+	
 }
 
 /// Shows the help menu
@@ -151,7 +215,7 @@ void setup_intro() {
 	Sleep(400);
 	std::cout << ".";
 	
-	std::cout << std::endl << std::endl << "Success! Here is your shell." << std::endl << "Type [help] for a list of commands. Type [exit]to quit." << std::endl << std::endl;
+	std::cout << std::endl << std::endl << "Success! Here is your shell." << std::endl << "Type [help] for a list of commands. Type [exit] to quit." << std::endl << std::endl;
 }
 
 /// Sets the color of the output window
@@ -176,10 +240,10 @@ Table* create_table(Database *db, std::string table_name, std::map<std::string, 
 
 	// insert into test_table (id, name) values((1, "test 1"), (2, "test 2"))
 	// Insert the rows
-	std::vector<std::string> v1 = {1, "test 1"};
-	std::vector<std::string> v2 = {2, "test 2"};
-	tbl->Insert(v1);
-	tbl->Insert(v2);
+//	std::vector<std::string> v1 = {1, "test 1"};
+//	std::vector<std::string> v2 = {2, "test 2"};
+//	tbl->Insert(v1);
+//	tbl->Insert(v2);
 
 	// Add the table to the database
 	db->AddTable(*tbl);
@@ -194,8 +258,11 @@ Database* create_db(Database *db, std::string db_name){
 }
 
 Table insert_into(std::string table_name, std::map<std::string, std::string> columns){
+	// Seperate values from commas
+	// Create a std::vector<std::string> using values
+	// Database->table->insert(rows);
 	
-    std::vector<std::string> v1
-	columns.Insert(v1);
-	return columns;
+//    std::vector<std::string> v1
+//	columns.Insert(v1);
+//	return columns;
 }

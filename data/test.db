@@ -8,6 +8,6 @@ row:2,test 2
 table_name:other_table
 keys:id p,o_id f
 columns:id int,description string,status string
-row:1,test 1
-row:2,test 2
+row:1,test 1,null
+row:2,test 2,active
 ;

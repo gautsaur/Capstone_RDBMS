@@ -1,0 +1,38 @@
+# depslib dependency file v1.0
+1636337302 source:c:\users\saura\downloads\semester 7\cs 4488\capstone\src\main.cpp
+	<iostream>
+	"database.h"
+	<windows.h>
+	<string>
+	<stdlib.h>
+	<regex>
+
+1636337214 c:\users\saura\downloads\semester 7\cs 4488\capstone\include\database.h
+	<algorithm>
+	"filehelper.h"
+	"table.h"
+
+1636255489 c:\users\saura\downloads\semester 7\cs 4488\capstone\include\filehelper.h
+	<fstream>
+	<sstream>
+	<dirent.h>
+	<string.h>
+	<iostream>
+
+1636258031 c:\users\saura\downloads\semester 7\cs 4488\capstone\include\table.h
+	<iostream>
+	<map>
+	<string>
+	<vector>
+
+1636255489 source:c:\users\saura\downloads\semester 7\cs 4488\capstone\src\test.cpp
+	<fstream>
+	<regex>
+	<bits/stdc++.h>
+	"../include/database.h"
+	"../include/utils.h"
+
+1634528484 c:\users\saura\downloads\semester 7\cs 4488\capstone\include\utils.h
+	<vector>
+	<string>
+

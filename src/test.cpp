@@ -1,6 +1,5 @@
 #include <fstream>
 #include <regex>
-#include <bits/stdc++.h>
 #include "../include/database.h"
 #include "../include/utils.h"
 using namespace std;
@@ -39,82 +38,90 @@ string splitString(string str, string delimiter)
 }
 
 
-vector<string> split_text(string input)
+vector<string> split_text(string input, string delimeter)
 {
     // Declare delimiters
-    string delimeters = " ,.-':;?()+*/%$#!\"@^&";
+    //string delimeters = " ,.-':;?()+*/%$#!\"@^&";
 
     // Get string split results
-    auto results = Utils::split(input, delimeters);
+    auto results = Utils::split(input, delimeter);
     return results;
 }
 
-void read_sql_file()
-{
-    fstream newfile;
-    newfile.open("../data/test.sql", ios::in); //open a file to perform read operation using file object
-    if (newfile.is_open())
-    { //checking whether the file is open
-        string tp;
 
-        // attach current database if not there
-        Database *db;
-        Table *tbl;
-        while (getline(newfile, tp))
-        {
-            cout<<"\nCurrent Line"<<tp;
-            if(tp.find("CREATE DATABASE")!=string::npos){
-                string databaseName = splitString(tp, "CREATE DATABASE");
-                db = new Database(databaseName);
-            }
+void read_sql_file_v2(){
+    ifstream infile { "../data/test.sql" };
+    string file_contents { istreambuf_iterator<char>(infile), istreambuf_iterator<char>() };
+    file_contents.erase(std::remove(file_contents.begin(), file_contents.end(), '\n'), file_contents.end());
+    
+    vector<string> commands = split_text(file_contents,";");
 
-            if(tp.find("CREATE TABLE")!= string::npos){
-               string tableName = splitString(tp, "CREATE TABLE");
-               tbl = new Table(tableName);
+    Database *db;
+    string table_name;
+    string current_db_name;
 
-               db->AddTable(*tbl);
-                while (getline(newfile, tp) && tp != ");")
-                {
-                    vector<string> temp = split_text(tp);
-                    if (temp.size() == 0){
-                        continue;
-                    }
-                    cout << "\nColumn Type: "<<temp[1] << "|| ColumnName: " <<temp[0];
-                    string colType;
+    for(auto& statement: commands){
+        string statement_lowercase = statement;
+        std::for_each(statement_lowercase.begin(), statement_lowercase.end(), [](char & c){
+            c = ::tolower(c);
+        });
 
-                    if (temp[1]=="varchar" || temp[1] == "char" || temp[1]=="string"){
-                        colType = "string";
-                    }
-                    else{
-                        colType ="int";
-                    }
+        if (statement_lowercase.find("create database") == 0){
+		    current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+            db = new Database(current_db_name);
+        }else if(statement_lowercase.find("create table") == 0){
+		    table_name = statement.substr(statement.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+		    Table *tbl = new Table(table_name);
+		    db->AddTable(*tbl);
+		}else if(statement_lowercase.find("insert into") == 0){
+		    vector<string> yo = split_text(statement, " (),'");
+            vector<string> columns;
+            bool columnSet = false;
+            vector<string> values;
+            int count = 0;
+            for(auto& it: yo){
 
-                    tbl->columns.insert({temp[1], temp[0]});
-                }   
-            }
+                string it_lowercase = it;
+                std::for_each(it_lowercase.begin(), it_lowercase.end(), [](char & c){
+                    c = ::tolower(c);
+                });
 
-            if(tp.find("INSERT INTO")!=string::npos){
-                string tableName = splitString(tp, "INSERT INTO");
-                vector<string> insertArrangement = split_text(tableName);
+                cout << it << "\n";
 
-                for(int i = 0; i<insertArrangement.size(); i++) {
-                    cout << insertArrangement[i] << endl;
+                if(count == 2){
+                    table_name = it;
                 }
-                while (getline(newfile, tp))
-                {
-                    string tableName = splitString(tp, "VALUES");
-                    vector<string> insertArrangement = split_text(tableName);
-                    tbl->Insert(insertArrangement);
-                }   
+                if (it_lowercase == "values"){
+                    columnSet = true;
+                    continue;
+                }
+                if (count >2 ){
+                    if (!columnSet){
+                        columns.push_back(it);
+                    }else{
+                        values.push_back(it);
+                    }
+                }
+                count = count +1;
             }
 
-            //print the data of the string
+            if (columns.size() != values.size()){
+                cout << "INSERT INTO function is formatted wrong!";
+                return;
+            }else{
+                Table current_table = db->get_table(table_name);
+                for( int i = 0; i <columns.size(); i++){
+                    vector<string> row;
+                    row.push_back(columns[i]);
+                    row.push_back(values[i]);
+                    current_table.Insert(row);
+                }
+            }
         }
-        newfile.close(); //close the file object.
     }
 }
 
 int main()
 {
-    read_sql_file();
+    read_sql_file_v2();
 }

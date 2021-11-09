@@ -53,7 +53,7 @@ void read_sql_file_v2(){
     ifstream infile { "../data/test.sql" };
     string file_contents { istreambuf_iterator<char>(infile), istreambuf_iterator<char>() };
     file_contents.erase(std::remove(file_contents.begin(), file_contents.end(), '\n'), file_contents.end());
-    
+
     vector<string> commands = split_text(file_contents,";");
 
     Database *db;
@@ -112,7 +112,6 @@ void read_sql_file_v2(){
                 Table current_table = db->get_table(table_name);
                 for( int i = 0; i <columns.size(); i++){
                     vector<string> row;
-                    row.push_back(columns[i]);
                     row.push_back(values[i]);
                     current_table.Insert(row);
                 }

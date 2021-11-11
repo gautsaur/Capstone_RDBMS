@@ -97,7 +97,6 @@ int main(int argc, char** argv) {
 			std::cout << "Good Bye" << std::endl;
 		} else if(tolower(cmd.find("create table ") == 0)){
 		    table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-		    db->AddTable(*tbl);
 		    //Table *tbl = create_table(current_db_name, table_name, );
 
 		} else if(tolower(cmd.find("table info ") == 0)){
@@ -109,12 +108,7 @@ int main(int argc, char** argv) {
 		    current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		 	db = new Database(current_db_name);
 		 	drop_database(db);
-		}else if(statement.find("drop table ") == 0){
-		    table_name = statement.substr(cmd.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
-
-
 		}
-
 		else {
 			std::cout << "Invalid Command." << std::endl;
 		}

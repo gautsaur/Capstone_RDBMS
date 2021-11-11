@@ -1,4 +1,3 @@
-#include <iostream>
 #include "database.h"
 #include <vector>
 #include <windows.h>

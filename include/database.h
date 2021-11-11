@@ -5,7 +5,7 @@
 *
 *   This file holds a class that defines a database and it's data to read and write from a .bin file.
 */
-
+#pragma once
 #include <algorithm>
 #include "filehelper.h"
 #include "table.h"
@@ -22,15 +22,16 @@ class Database {
 		std::vector<Table> tables;
 
 		static void List();
-
+		
+		void List_Tables();
+		
 		void AddTable(Table &tbl);
-		void DropTable(std::string name);
-		void ListTables();
 
 		void Delete();
 
 		void Save();
-
+		
+		//Table * get_table(std::string tbl_name);
 		Table get_table(std::string tbl_name);
 
 		Database();
@@ -65,7 +66,9 @@ std::string* split_str(std::string str, char delim){
 /// Deletes the current data base
 /// Todo: Delete the associated .db file aswell.
 void Database::Delete() {
+    //remove file
 	delete this;
+
 }
 
 /// Author: Andrew Nunez
@@ -221,21 +224,21 @@ void Database::List() {
 	FileHelper::listfiles("data", ".db");
 }
 
-void Database::ListTables() {
-    for (auto& it: tables){
-        std::cout << it.table_name << "\n";
-    }
+void Database::List_Tables() {
+	for(Table tbl : tables) {
+		std::cout << tbl.table_name << std::endl;
+	}
 }
 
 Table Database::get_table(std::string name){
 	Table ret;
-
-	auto tbl = find_if(tables.begin(), tables.end(), [&name](const Table& obj) {
-		return obj.table_name == name;
-	});
-
-	if(tbl != tables.end()) {
-		ret = *tbl;
+	
+	for(Table tbl : tables){
+		if(tbl.table_name == name){
+			ret = tbl;
+			
+			break;
+		}
 	}
 
 	return ret;

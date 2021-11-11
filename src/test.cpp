@@ -1,4 +1,6 @@
 #include <fstream>
+#include <algorithm>
+
 #include <regex>
 #include "../include/database.h"
 #include "../include/utils.h"
@@ -10,6 +12,23 @@ void check_command(string enteredCommand, string commandToCheck)
     {
         std::cout << "found!" << '\n';
     }
+}
+
+Table* create_table(Database *db, std::string table_name, std::map<std::string, std::string> columns){
+    // (create table) (test_table) (id int, name string)
+    Table *tbl = new Table(table_name);
+
+    // Set the columns
+    for(std::map<std::string, std::string>::iterator it = columns.begin(); it != columns.end(); ++it) {
+        std::string key = it->first;
+        std::string value = it->second;
+        tbl->columns.insert({key, value});
+    }
+
+	// Add the table to the database
+	db->AddTable(*tbl);
+
+	return tbl;
 }
 
 
@@ -70,9 +89,43 @@ void read_sql_file_v2(){
 		    current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
             db = new Database(current_db_name);
         }else if(statement_lowercase.find("create table") == 0){
-		    table_name = statement.substr(statement.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
-		    Table *tbl = new Table(table_name);
-		    db->AddTable(*tbl);
+            cout << statement << "\n";
+		    vector<string> yo = split_text(statement, " (),'");
+            std::map<std::string, std::string> read_columns;
+            string key = "";
+            string value = "";
+            int count = 0;
+            for(auto& it: yo){
+                cout << it << "\n";
+                string it_lowercase = it;
+                std::for_each(it_lowercase.begin(), it_lowercase.end(), [](char & c){
+                    c = ::tolower(c);
+                });
+
+                if(count == 2){
+                    table_name = it;
+                }
+                if (count >2 ){
+                    if(count %3 == 0){
+                        key = it;
+                    }
+                    if(count %3 ==1){
+                        if(it_lowercase == "int"){
+                            value = "int";
+                        }else{
+                            value = "string";
+                        }
+                    }
+                    if(count%3 == 2){
+                        read_columns.insert({key,value});
+                        key ="";
+                        value="";
+                    }
+                }
+                count = count +1;
+            }
+
+            create_table(db,table_name,read_columns);
 		}else if(statement_lowercase.find("insert into") == 0){
 		    vector<string> yo = split_text(statement, " (),'");
             vector<string> columns;
@@ -85,8 +138,6 @@ void read_sql_file_v2(){
                 std::for_each(it_lowercase.begin(), it_lowercase.end(), [](char & c){
                     c = ::tolower(c);
                 });
-
-                cout << it << "\n";
 
                 if(count == 2){
                     table_name = it;
@@ -110,10 +161,34 @@ void read_sql_file_v2(){
                 return;
             }else{
                 Table current_table = db->get_table(table_name);
+                vector<string> row_entry;
+                vector<string> col_names = current_table.get_column_names();
+                reverse(col_names.begin(),col_names.end());
+
+                for(int i=0; i < col_names.size(); i++){
+                    cout << col_names.at(i) << ' ';
+                }
+                int index = -1;
                 for( int i = 0; i <columns.size(); i++){
-                    vector<string> row;
-                    row.push_back(values[i]);
-                    current_table.Insert(row);
+
+                    cout << "Looking column:" << columns[i] << "\n";
+
+                    auto it = std::find(col_names.begin(), col_names.end(), columns[i]);
+                    if (it == col_names.end())
+                    {
+                      // name not in vector
+                    } else
+                    {
+                      index = distance(col_names.begin(), it);
+                    }
+
+                    cout << "Index is :"<<index;
+
+                    if (!index){
+                        row_entry.push_back("NULL");
+                    }else{
+                        row_entry.push_back(values[index]);
+                    }
                 }
             }
         }
@@ -124,3 +199,4 @@ int main()
 {
     read_sql_file_v2();
 }
+

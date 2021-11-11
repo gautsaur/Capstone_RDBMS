@@ -188,3 +188,4 @@ Table* create_table(Database *db, std::string table_name, std::map<std::string, 
 
 	return tbl;
 }
+

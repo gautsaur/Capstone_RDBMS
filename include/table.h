@@ -35,6 +35,8 @@ class Table {
 		// TODO: Add column names
 		std::vector<std::vector<std::string> > Select(std::vector<std::string> col_names);
 
+		std::vector<std::string> get_column_names();
+
 		void Delete();
 
 		Table() {
@@ -69,4 +71,15 @@ std::vector<std::vector<std::string> > Table::Select(std::vector<std::string> co
 // TODO: Tie into user input
 void Table::Delete() {
 	delete this;
+}
+
+std::vector<std::string> Table::get_column_names(){
+    std::vector<std::string> temp;
+    auto iter = columns.begin();
+    while (iter != columns.end()) {
+		std::cout << iter ->first << "\n";
+        temp.push_back(iter -> first);
+		iter++;
+    }
+    return temp;
 }

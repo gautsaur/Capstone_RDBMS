@@ -2,7 +2,7 @@
 #include <fstream>
 #include <regex>
 #include <bits/stdc++.h>
-#include "../include/utils.h"
+#include "utils.h"
 using namespace std;
 
 class Parser {
@@ -14,6 +14,7 @@ class Parser {
 		//void static read_sql_file();
 		vector<string> static get_select_columns(string cmd);
 		static string* split_str(std::string str, char delim);
+		vector<string> static get_create_columns(string cmd);
 		vector<pair<string, string> > get_where_clause(string cmd);
 				
 };
@@ -78,6 +79,34 @@ vector<string> Parser::get_select_columns(string cmd) {
 	} else {
 		cout << "No Match!" << endl;
 	}
+			
+	return ret;
+	
+}
+
+vector<string> Parser::get_create_columns(string cmd) {
+	smatch sm;
+	vector<string> ret;
+		
+	regex str_expr("\\((.*)\\)");
+	
+	// Check if the match was found, and add to the vector
+	if(regex_search(cmd, sm, str_expr)){
+		try
+		{
+			ret = Utils::split(sm[1], ",");
+			
+		} catch(const std::exception& e) {
+			std::cout << "Exception: " << e.what() << std::endl;
+		}
+		
+	} else {
+		cout << "No Match!" << endl;
+	}
+		
+//	for(auto &v : ret){
+//		std::cout << v << std::endl;
+//	}
 			
 	return ret;
 	

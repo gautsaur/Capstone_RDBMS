@@ -22,15 +22,17 @@ class Database {
 		std::vector<Table> tables;
 
 		static void List();
-		
+
 		void List_Tables();
-		
+
 		void AddTable(Table &tbl);
 
 		void Delete();
 
+		void DropTable(std::string name);
+
 		void Save();
-		
+
 		//Table * get_table(std::string tbl_name);
 		Table get_table(std::string tbl_name);
 				
@@ -206,11 +208,11 @@ void Database::List_Tables() {
 
 Table Database::get_table(std::string name){
 	Table ret;
-	
+
 	for(Table tbl : tables){
 		if(tbl.table_name == name){
 			ret = tbl;
-			
+
 			break;
 		}
 	}

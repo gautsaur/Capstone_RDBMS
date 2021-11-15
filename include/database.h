@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "filehelper.h"
 #include "table.h"
+#include <stdbool.h>
 
 class Database {
 	private:
@@ -29,9 +30,11 @@ class Database {
 
 		void Delete();
 
+		void Save();
+
 		void DropTable(std::string name);
 
-		void Save();
+		bool find_table(std::string name);
 
 		//Table * get_table(std::string tbl_name);
 		Table get_table(std::string tbl_name);
@@ -113,6 +116,17 @@ void Database::Save(){
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
 void Database::AddTable(Table &tbl) {
 	tables.push_back(tbl);
+}
+
+void Database::DropTable(std::string name) {
+    int count = 0;
+    for (auto& it: tables){
+        if (it.table_name == name){
+            tables.erase(tables.begin()+count);
+        }
+        count = count +1;
+    }
+    List_Tables();
 }
 
 /// Author: Andrew Nunez
@@ -203,6 +217,16 @@ void Database::List() {
 void Database::List_Tables() {
 	for(Table tbl : tables) {
 		std::cout << tbl.table_name << std::endl;
+	}
+}
+
+bool Database::find_table(std::string name) {
+	for(Table tbl : tables) {
+
+		if (name == tbl.table_name){
+            return true;
+		}
+		else return false;
 	}
 }
 

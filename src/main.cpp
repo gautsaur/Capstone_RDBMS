@@ -218,9 +218,19 @@ Database* create_db(Database *db, std::string db_name){
 	return cr;
 }
 
-Table insert_into(std::string table_name, std::map<std::string, std::string> columns){
-	
-    std::vector<std::string> v1
-	columns.Insert(v1);
-	return columns;
+Table insert_into(std::string table_name, std::map<std::string, std::string> columns, std::map<std::string, std::string> values ){
+  // Seperate values from commas
+  // Create a std::vector<std::string> using values
+  // Database->table->insert(rows);
+    
+    std::vector<std::string> v;
+    std::stringstream ss(values);
+
+    while (ss.good()) {
+        std::string substr;
+        getline(ss, substr, ',');
+        v.push_back(substr);
+    }
+
+	//Database->table->insert(v);
 }

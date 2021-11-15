@@ -10,7 +10,7 @@
 void color(int s);
 void setup_intro();
 void show_help();
-//void print_rows(Table tbl);
+void print_rows(Table tbl);
 std::string to_lower(std::string str);
 std::string remove_char(std::string str, char delim);
 HANDLE h = GetStdHandle( STD_OUTPUT_HANDLE );
@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 	setup_intro();
 
 	Database *db;
-
+			
 	while(to_lower(cmd) != "exit") {
 		cmd = "";
 				
@@ -82,11 +82,11 @@ int main(int argc, char** argv) {
 		} else if (tolower(cmd.find("select ") == 0)) {
 			// Parses the select command
 			try	{
-
+				
 				std::string tbl_name = statement.substr(statement.find(" from") + 6);
-
+				
 				tbl_name = remove_char(tbl_name, ';');
-
+				
 				Table tbl = db->get_table(tbl_name);
 								
 				if(tbl.table_name.length() > 0){
@@ -104,6 +104,7 @@ int main(int argc, char** argv) {
 		}  else if(statement.find("create table ") == 0){
 		    table_name = statement.substr(cmd.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
 		    //Table *tbl = new create_table(current_db_name, table_name, );
+		    std::vector<std::string> cols = Parser::get_create_columns(statement);
 
 		}else if(tolower(cmd.find("insert into")==0)){
             table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
@@ -138,9 +139,9 @@ std::string to_lower(std::string s){
 
 std::string remove_char(std::string str, char delim){
 	str.erase(std::remove(str.begin(), str.end(), delim), str.end());
-
+	
 	return str;
-
+	
 }
 
 void print_rows(Table tbl){
@@ -280,8 +281,7 @@ void drop_table(Database *db, Table* tbl){
         }
     }
 
-
-    auto test = find_if(db->tables.begin(), db->tables.end(), [&table_name](const Table& obj){return obj.table_name == table_name;});
+    //auto test = find_if(db->tables.begin(), db->tables.end(), [&table_name](const Table& obj){return obj.table_name == table_name;});
     db->Save();
 
 }

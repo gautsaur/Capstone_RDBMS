@@ -1,0 +1,6 @@
+Database:testdbsaurav
+table_name:customers
+
+keys
+columns:city ,country ,customername 
+;

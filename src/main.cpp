@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 		    current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
             db = new Database(current_db_name);
 		
-		} else if (statement == "list database") {
+		} else if (statement == "list database;") {
 			Database::List();
 		} else if (statement == "list tables;") {
 			if(current_db_name.length() == 0) {
@@ -382,8 +382,12 @@ Table* create_table(Database *db, std::string table_name, std::vector<std::strin
                 }
             }
 
+			cout << "Creating Table: " << table_name << endl;
+
             // Add the table to the database
             db->AddTable(*tbl);
+
+			db->Save();
 
             return tbl;
         }
@@ -465,36 +469,40 @@ void read_sql_file(string path)
     
     std::ifstream in("data/testFile.sql", std::ios::in | std::ios::binary);
     std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-    cout << content; //you can do anything with the string!!!
+    //cout << content; //you can do anything with the string!!!
     
     vector<string> commands = split_text(content, ";");
-    cout << commands.size();
+    //cout << commands.size();
     Database *db;
     string table_name;
-    string current_db_name;
+    string db_name;
 
-    for (auto &statement : commands)
+    for (auto &orig_statement : commands)
     {
-        string statement_lowercase = statement;
-        std::for_each(statement_lowercase.begin(), statement_lowercase.end(), [](char &c)
-                      { c = ::tolower(c); });
+    	string statement = to_lower(orig_statement);
+        
+        cout << statement << endl;
+        
+        cout << statement.find("create table") << endl;
 
-        if (statement_lowercase.find("create database") == 0)
+        if (statement.rfind("create database", 0) == 0)
         {
-            current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
-            db = new Database(current_db_name);
+            db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+            db = new Database();
+            db->database_name = db_name;
         }
-        else if (statement_lowercase.find("create table") == 0)
+        else if (statement.find("create table") == 4)
         {
-            cout << statement << "\n";
+            //cout << statement << "\n";
             vector<string> yo = split_text(statement, " (),'");
-            std::map<std::string, std::string> read_columns;
+            vector<string> read_columns;
+            string column;
             string key = "";
             string value = "";
             int count = 0;
             for (auto &it : yo)
             {
-                cout << it << "\n";
+                //cout << it << "\n";
                 string it_lowercase = it;
                 std::for_each(it_lowercase.begin(), it_lowercase.end(), [](char &c)
                               { c = ::tolower(c); });
@@ -507,22 +515,25 @@ void read_sql_file(string path)
                 {
                     if (count % 3 == 0)
                     {
-                        key = it;
+                    	column = it + " ";
+                        //key = it;
                     }
                     if (count % 3 == 1)
                     {
-                        if (it_lowercase == "int")
-                        {
-                            value = "int";
-                        }
-                        else
-                        {
-                            value = "string";
-                        }
+                    	column += it_lowercase;
+//                        if (it_lowercase == "int")
+//                        {
+//                            value = "int";
+//                        }
+//                        else
+//                        {
+//                            value = "string";
+//                        }
                     }
                     if (count % 3 == 2)
                     {
-                        read_columns.insert({key, value});
+                        read_columns.push_back(column);
+                        column = "";
                         key = "";
                         value = "";
                     }
@@ -530,12 +541,19 @@ void read_sql_file(string path)
                 count = count + 1;
             }
 
+			cout << db_name << endl;
+
+			current_db_name = db_name;
+
             create_table(db, table_name, read_columns);
         }
-        else if (statement_lowercase.find("insert into") == 0)
+        else if (statement.find("insert into") == 0)
         {
             vector<string> yo = split_text(statement, " (),'");
             insert_into(db,yo);
         }
     }
+    
+    db->Save();
+    
 }

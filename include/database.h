@@ -39,7 +39,9 @@ class Database {
 		//Table * get_table(std::string tbl_name);
 		Table get_table(std::string tbl_name);
 				
-		Database();
+		Database(){
+			
+		}
 
 		// Use this a the create a DB
 		// TODO: Tie into user input

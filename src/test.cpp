@@ -69,12 +69,13 @@ vector<string> split_text(string input, string delimeter)
 
 
 void read_sql_file_v2(){
-    ifstream infile { "../data/test.sql" };
+    ifstream infile { "testFile.sql" };
     string file_contents { istreambuf_iterator<char>(infile), istreambuf_iterator<char>() };
     file_contents.erase(std::remove(file_contents.begin(), file_contents.end(), '\n'), file_contents.end());
 
+    cout<<file_contents;
     vector<string> commands = split_text(file_contents,";");
-
+    cout<< commands.size();
     Database *db;
     string table_name;
     string current_db_name;

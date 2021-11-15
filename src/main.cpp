@@ -24,6 +24,7 @@ void drop_table(Database *db, Table* tbl);
 void drop_database(Database *db);
 bool has_special_char(std::string const &str);
 void table_info(Table* tbl);
+void read_sql_file(string path);
 
 
 int main(int argc, char** argv) {
@@ -35,19 +36,19 @@ int main(int argc, char** argv) {
 
 	while(to_lower(cmd) != "exit") {
 		cmd = "";
-				
+
 		// Setup the command to wait for input
 		color(10);
 		if(current_db_name.length() > 0) {
 			std::cout << current_db_name << "@";
 		}
-			
+
 		std::cout << "SQL>";
 		color(7);
 		std::getline(std::cin, cmd);
 		std::string statement = to_lower(cmd);
-		
-		
+
+
 		// SELECT [ID, TEST, ] FROM TABLE;
 
 		// Do something with cmd
@@ -55,8 +56,8 @@ int main(int argc, char** argv) {
 			std::cout << "Good Bye" << std::endl;
 		} else if (statement == "help") {
 			show_help();
-		
-		} else if(cmd.back() != ';') {
+
+		} else if(statement.back() != ';') {
 			std::cout << "SQL command not properly terminated." << std::endl;
 		} else if(statement.find("open database ") == 0){
 			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
@@ -66,11 +67,11 @@ int main(int argc, char** argv) {
 				current_db_name = "";
 			}
 
-		} else if (cmd.find("create database") == 0){
+		} else if (statement.find("create database") == 0){
 		    current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
             db = new Database(current_db_name);
-		
-		} else if (to_lower(cmd) == "list database") {
+
+		} else if (statement == "list database") {
 			Database::List();
 		} else if (statement == "list tables;") {
 			if(current_db_name.length() == 0) {
@@ -78,8 +79,8 @@ int main(int argc, char** argv) {
 			} else {
 				db->List_Tables();
 			}
-			
-		} else if (tolower(cmd.find("select ") == 0)) {
+
+		} else if (statement.find("select ") == 0) {
 			// Parses the select command
 			try	{
 
@@ -88,36 +89,39 @@ int main(int argc, char** argv) {
 				tbl_name = remove_char(tbl_name, ';');
 
 				Table tbl = db->get_table(tbl_name);
-								
+
 				if(tbl.table_name.length() > 0){
 					std::vector<std::string> cols = Parser::get_select_columns(statement);
 					tbl.Print_Rows(cols);
-					
+
 				} else {
 					std::cout << "Table does not exist." << std::endl;
 				}
-				
+
 			} catch(const std::exception&) {
 
 			}
-		
+
 		}  else if(statement.find("create table ") == 0){
-		    table_name = statement.substr(cmd.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+		    table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
 		    //Table *tbl = new create_table(current_db_name, table_name, );
 
-		}else if(tolower(cmd.find("insert into")==0)){
+		}else if(statement.find("insert into")==0){
             table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-            
 
-		} else if(tolower(cmd.find("table info ") == 0)){
+
+		} else if(statement.find("table info ") == 0){
 		    table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		    Table *tbl =  new Table(table_name);
 		    table_info(tbl);
 
-		} else if(tolower(cmd.find("drop database ") == 0)){
+		} else if(statement.find("drop database ") == 0){
 		    current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		 	db = new Database(current_db_name);
 		 	drop_database(db);
+		}else if (statement.find("load sqlfile ") == 0){
+            string target_file_path = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+            read_sql_file(target_file_path);
 		}
 		else {
 			std::cout << "Invalid Command." << std::endl;
@@ -152,52 +156,52 @@ void print_rows(Table tbl){
 
 	for (auto const& it : tbl.columns) {
 		std::cout << it.first;
-		
+
 		for(int i = 0; i < col_char_count - it.first.length(); i += 1) {
 			std::cout << " ";
 		}
-		
+
 		std::cout << " | ";
-		
+
 	}
-	
+
 	std::cout << std::endl;
-	
+
 	for(int i = 0; i < row_char_count; i += 1) {
 		std::cout << "=";
 	}
-	
+
 	std::cout << std::endl;
-	
-	
-	
+
+
+
 	for(std::vector<std::string> row : tbl.rows) {
 		std::cout << "| ";
-		
+
 		for(std::string &value : row){
 			std::cout << value;
-			
+
 			for(int i = 0; i < col_char_count - value.length(); i += 1) {
 				std::cout << " ";
 			}
-			
+
 			std::cout  << " | ";
-		
+
 		}
-				
+
 		std::cout << std::endl;
-		
+
 		for(int i = 0; i < row_char_count; i += 1) {
 			std::cout << "-";
 		}
-			
+
 		std::cout << std::endl;
-				
+
 		row_count += 1;
 	}
-		
+
 	std::cout << row_count << " rows selected." << std::endl;
-	
+
 }
 
 /// Shows the help menu
@@ -231,7 +235,7 @@ void setup_intro() {
 	std::cout << ".";
 	Sleep(400);
 	std::cout << ".";
-	
+
 	std::cout << std::endl << std::endl << "Success! Here is your shell." << std::endl << "Type [help] for a list of commands. Type [exit] to quit." << std::endl << std::endl;
 }
 
@@ -296,7 +300,7 @@ Table insert_into(std::string table_name, std::map<std::string, std::string> col
 	// Seperate values from commas
 	// Create a std::vector<std::string> using values
 	// Database->table->insert(rows);
-	
+
 //    std::vector<std::string> v1
 //	columns.Insert(v1);
 //	return columns;
@@ -338,6 +342,135 @@ bool has_special_char(std::string const &s) {
     for(int i=0;i<s.length();i++){
         if( !std::isalpha(s[i]) && !std::isdigit(s[i]) && s[i]!='_')
           return false;
+    }
+}
+
+
+void read_sql_file(string path){
+    ifstream infile {path };
+    string file_contents { istreambuf_iterator<char>(infile), istreambuf_iterator<char>() };
+    file_contents.erase(std::remove(file_contents.begin(), file_contents.end(), '\n'), file_contents.end());
+
+    cout<<file_contents;
+    vector<string> commands = split_text(file_contents,";");
+    cout<< commands.size();
+    Database *db;
+    string table_name;
+    string current_db_name;
+
+    for(auto& statement: commands){
+        string statement_lowercase = statement;
+        std::for_each(statement_lowercase.begin(), statement_lowercase.end(), [](char & c){
+            c = ::tolower(c);
+        });
+
+        if (statement_lowercase.find("create database") == 0){
+		    current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+            db = new Database(current_db_name);
+        }else if(statement_lowercase.find("create table") == 0){
+            cout << statement << "\n";
+		    vector<string> yo = split_text(statement, " (),'");
+            std::map<std::string, std::string> read_columns;
+            string key = "";
+            string value = "";
+            int count = 0;
+            for(auto& it: yo){
+                cout << it << "\n";
+                string it_lowercase = it;
+                std::for_each(it_lowercase.begin(), it_lowercase.end(), [](char & c){
+                    c = ::tolower(c);
+                });
+
+                if(count == 2){
+                    table_name = it;
+                }
+                if (count >2 ){
+                    if(count %3 == 0){
+                        key = it;
+                    }
+                    if(count %3 ==1){
+                        if(it_lowercase == "int"){
+                            value = "int";
+                        }else{
+                            value = "string";
+                        }
+                    }
+                    if(count%3 == 2){
+                        read_columns.insert({key,value});
+                        key ="";
+                        value="";
+                    }
+                }
+                count = count +1;
+            }
+
+            create_table(db,table_name,read_columns);
+		}else if(statement_lowercase.find("insert into") == 0){
+		    vector<string> yo = split_text(statement, " (),'");
+            vector<string> columns;
+            bool columnSet = false;
+            vector<string> values;
+            int count = 0;
+            for(auto& it: yo){
+
+                string it_lowercase = it;
+                std::for_each(it_lowercase.begin(), it_lowercase.end(), [](char & c){
+                    c = ::tolower(c);
+                });
+
+                if(count == 2){
+                    table_name = it;
+                }
+                if (it_lowercase == "values"){
+                    columnSet = true;
+                    continue;
+                }
+                if (count >2 ){
+                    if (!columnSet){
+                        columns.push_back(it);
+                    }else{
+                        values.push_back(it);
+                    }
+                }
+                count = count +1;
+            }
+
+            if (columns.size() != values.size()){
+                cout << "INSERT INTO function is formatted wrong!";
+                return;
+            }else{
+                Table current_table = db->get_table(table_name);
+                vector<string> row_entry;
+                vector<string> col_names = current_table.get_column_names();
+                reverse(col_names.begin(),col_names.end());
+
+                for(int i=0; i < col_names.size(); i++){
+                    cout << col_names.at(i) << ' ';
+                }
+                int index = -1;
+                for( int i = 0; i <columns.size(); i++){
+
+                    cout << "Looking column:" << columns[i] << "\n";
+
+                    auto it = std::find(col_names.begin(), col_names.end(), columns[i]);
+                    if (it == col_names.end())
+                    {
+                      // name not in vector
+                    } else
+                    {
+                      index = distance(col_names.begin(), it);
+                    }
+
+                    cout << "Index is :"<<index;
+
+                    if (!index){
+                        row_entry.push_back("NULL");
+                    }else{
+                        row_entry.push_back(values[index]);
+                    }
+                }
+            }
+        }
     }
 }
 

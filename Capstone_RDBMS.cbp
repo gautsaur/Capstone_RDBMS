@@ -17,9 +17,10 @@
 		</Compiler>
 		<Unit filename="include/database.h" />
 		<Unit filename="include/filehelper.h" />
+		<Unit filename="include/parser.h" />
 		<Unit filename="include/table.h" />
+		<Unit filename="include/utils.h" />
 		<Unit filename="src/main.cpp" />
-		<Unit filename="src/test.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

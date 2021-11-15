@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "filehelper.h"
 #include "table.h"
+#include <stdbool.h>
 
 class Database {
 	private:
@@ -22,15 +23,19 @@ class Database {
 		std::vector<Table> tables;
 
 		static void List();
-		
+
 		void List_Tables();
-		
+
 		void AddTable(Table &tbl);
 
 		void Delete();
 
 		void Save();
-		
+
+		void DropTable(std::string name);
+
+		bool find_table(std::string name);
+
 		//Table * get_table(std::string tbl_name);
 		Table get_table(std::string tbl_name);
 
@@ -137,6 +142,7 @@ void Database::DropTable(std::string name) {
         }
         count = count +1;
     }
+    List_Tables();
 }
 
 /// Author: Andrew Nunez
@@ -230,13 +236,23 @@ void Database::List_Tables() {
 	}
 }
 
+bool Database::find_table(std::string name) {
+	for(Table tbl : tables) {
+
+		if (name == tbl.table_name){
+            return true;
+		}
+		else return false;
+	}
+}
+
 Table Database::get_table(std::string name){
 	Table ret;
-	
+
 	for(Table tbl : tables){
 		if(tbl.table_name == name){
 			ret = tbl;
-			
+
 			break;
 		}
 	}

@@ -4,6 +4,8 @@
 #include <string>
 #include <stdlib.h>
 #include <regex>
+#include <iostream>
+#include <sstream>
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
@@ -15,7 +17,7 @@ std::string to_lower(std::string str);
 std::string remove_char(std::string str, char delim);
 HANDLE h = GetStdHandle( STD_OUTPUT_HANDLE );
 std::string current_db_name;
-Table* create_table(Database *db, std::string table_name);
+Table* create_table(Database *db, std::string table_name, std::vector<std::string> columns);
 std::string table_name;
 Database* create_db(Database *db, std::string db_name);
 std::string db_name;
@@ -23,7 +25,7 @@ Table insert_into(std::string table_name, std::map<std::string, std::string> col
 void drop_table(Database *db, Table* tbl);
 void drop_database(Database *db);
 bool has_special_char(std::string const &str);
-void table_info(Table* tbl);
+void table_info(Table tbl);
 
 
 int main(int argc, char** argv) {
@@ -35,19 +37,19 @@ int main(int argc, char** argv) {
 
 	while(to_lower(cmd) != "exit") {
 		cmd = "";
-				
+
 		// Setup the command to wait for input
 		color(10);
 		if(current_db_name.length() > 0) {
 			std::cout << current_db_name << "@";
 		}
-			
+
 		std::cout << "SQL>";
 		color(7);
 		std::getline(std::cin, cmd);
 		std::string statement = to_lower(cmd);
-		
-		
+
+
 		// SELECT [ID, TEST, ] FROM TABLE;
 
 		// Do something with cmd
@@ -55,7 +57,7 @@ int main(int argc, char** argv) {
 			std::cout << "Good Bye" << std::endl;
 		} else if (statement == "help") {
 			show_help();
-		
+
 		} else if(cmd.back() != ';') {
 			std::cout << "SQL command not properly terminated." << std::endl;
 		} else if(statement.find("open database ") == 0){
@@ -69,8 +71,8 @@ int main(int argc, char** argv) {
 		} else if (cmd.find("create database") == 0){
 		    current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
             db = new Database(current_db_name);
-		
-		} else if (to_lower(cmd) == "list database") {
+
+		} else if (to_lower(cmd) == "list database;") {
 			Database::List();
 		} else if (statement == "list tables;") {
 			if(current_db_name.length() == 0) {
@@ -78,7 +80,7 @@ int main(int argc, char** argv) {
 			} else {
 				db->List_Tables();
 			}
-			
+
 		} else if (tolower(cmd.find("select ") == 0)) {
 			// Parses the select command
 			try	{
@@ -88,36 +90,55 @@ int main(int argc, char** argv) {
 				tbl_name = remove_char(tbl_name, ';');
 
 				Table tbl = db->get_table(tbl_name);
-								
+
 				if(tbl.table_name.length() > 0){
 					std::vector<std::string> cols = Parser::get_select_columns(statement);
 					tbl.Print_Rows(cols);
-					
+
 				} else {
 					std::cout << "Table does not exist." << std::endl;
 				}
-				
+
 			} catch(const std::exception&) {
 
 			}
-		
+
 		}  else if(statement.find("create table ") == 0){
-		    table_name = statement.substr(cmd.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
-		    //Table *tbl = new create_table(current_db_name, table_name, );
+		    vector<string> result;
+		    stringstream ss (statement);
+		    string item;
+		    while (std::getline (ss, item, ' ' )) {
+                    result.push_back (item);
+            }
+            int k = 0;
+            for (auto i : result){
+                if (k == 2){
+                    table_name = i;
+                }
+                k++;
+            }
+
+		    vector<string> columns = Parser::get_create_columns(statement);
+
+		    Table *tbl =  create_table(db, table_name, columns);
+
 
 		}else if(tolower(cmd.find("insert into")==0)){
             table_name = cmd.substr(cmd.find_last_of(' ' ) + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-            
+
 
 		} else if(tolower(cmd.find("table info ") == 0)){
 		    table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-		    Table *tbl =  new Table(table_name);
+		    Table tbl =  db->get_table(table_name);
 		    table_info(tbl);
 
 		} else if(tolower(cmd.find("drop database ") == 0)){
-		    current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-		 	db = new Database(current_db_name);
+		    db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+		 	db = new Database(db_name);
 		 	drop_database(db);
+		} else if(tolower(cmd.find("drop table ") == 0)){
+		    table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+		 	db->DropTable(table_name);
 		}
 		else {
 			std::cout << "Invalid Command." << std::endl;
@@ -152,52 +173,52 @@ void print_rows(Table tbl){
 
 	for (auto const& it : tbl.columns) {
 		std::cout << it.first;
-		
+
 		for(int i = 0; i < col_char_count - it.first.length(); i += 1) {
 			std::cout << " ";
 		}
-		
+
 		std::cout << " | ";
-		
+
 	}
-	
+
 	std::cout << std::endl;
-	
+
 	for(int i = 0; i < row_char_count; i += 1) {
 		std::cout << "=";
 	}
-	
+
 	std::cout << std::endl;
-	
-	
-	
+
+
+
 	for(std::vector<std::string> row : tbl.rows) {
 		std::cout << "| ";
-		
+
 		for(std::string &value : row){
 			std::cout << value;
-			
+
 			for(int i = 0; i < col_char_count - value.length(); i += 1) {
 				std::cout << " ";
 			}
-			
+
 			std::cout  << " | ";
-		
+
 		}
-				
+
 		std::cout << std::endl;
-		
+
 		for(int i = 0; i < row_char_count; i += 1) {
 			std::cout << "-";
 		}
-			
+
 		std::cout << std::endl;
-				
+
 		row_count += 1;
 	}
-		
+
 	std::cout << row_count << " rows selected." << std::endl;
-	
+
 }
 
 /// Shows the help menu
@@ -231,7 +252,7 @@ void setup_intro() {
 	std::cout << ".";
 	Sleep(400);
 	std::cout << ".";
-	
+
 	std::cout << std::endl << std::endl << "Success! Here is your shell." << std::endl << "Type [help] for a list of commands. Type [exit] to quit." << std::endl << std::endl;
 }
 
@@ -241,20 +262,30 @@ void color( int s){
 }
 
 
-Table* create_table(Database *db, std::string table_name, std::map<std::string, std::string> columns){
+Table* create_table(Database *db, std::string table_name, std::vector<std::string> columns){
     // (create table) (test_table) (id int, name string)
 
-    if (!current_db_name.empty() && has_special_char(current_db_name)!= false){
-        auto tbl = find_if(db->tables.begin(), db->tables.end(), [&table_name](const Table& obj){return obj.table_name == table_name;});
-        if (tbl == db->tables.end()){
+    if (!current_db_name.empty() && has_special_char(current_db_name)!= true){
+            if (db->find_table(table_name) != true ){
 
             Table *tbl = new Table(table_name);
 
-            // Set the columns
-            for(std::map<std::string, std::string>::iterator it = columns.begin(); it != columns.end(); ++it) {
-                std::string key = it->first;
-                std::string value = it->second;
-                tbl->columns.insert({key, value});
+            for (string i: columns){
+                stringstream ss(i);
+                string s;
+                int n = 1;
+                std::string key;
+                std::string value;
+                while (ss >> s) {
+                        if (n ==1){
+                            key = s;
+                        }
+                        if (n == 2){
+                           value = s;
+                        }
+                        tbl->columns.insert({key, value});
+                        n++;
+                }
             }
 
             // Add the table to the database
@@ -266,11 +297,6 @@ Table* create_table(Database *db, std::string table_name, std::map<std::string, 
 }
 
 void drop_table(Database *db, Table* tbl){
-    //test to see if it is removed from collection of tables
-    //delete from vector
-    //only deletes the copy
-    //test to see if a table exists
-    //resave the database
     tbl->Delete();
 
     for (std::vector<Table>::iterator it = db->tables.begin(); it != db->tables.end(); ++it) {
@@ -279,9 +305,6 @@ void drop_table(Database *db, Table* tbl){
             break;
         }
     }
-
-
-    auto test = find_if(db->tables.begin(), db->tables.end(), [&table_name](const Table& obj){return obj.table_name == table_name;});
     db->Save();
 
 }
@@ -296,13 +319,15 @@ Table insert_into(std::string table_name, std::map<std::string, std::string> col
 	// Seperate values from commas
 	// Create a std::vector<std::string> using values
 	// Database->table->insert(rows);
-	
+
 //    std::vector<std::string> v1
 //	columns.Insert(v1);
 //	return columns;
 }
+
 void drop_database(Database *db){
     //delete the database file in the database.h
+
 
     std::string s1 = "Data/";
     std::string s2 = db->database_name;
@@ -316,21 +341,17 @@ void drop_database(Database *db){
        puts( "File successfully deleted" );
 
     db->Delete();
-
     db->List();
 
 
 }
 
-void table_info(Table* tbl){
-    std::cout << "Table name: " + tbl->table_name << std::endl;
+void table_info(Table tbl){
+    std::cout << "Table name: " + tbl.table_name << std::endl;
     std::cout << "Column names: " << std::endl;
-    std::map<std::string, std::string>::iterator it = tbl->columns.begin();
-    while (it != tbl->columns.end())
-    {
-        std::cout << "Name: " + it->first + "    Type: " + it->second << std::endl;
-    }
-    std::cout << "Number of Rows: " + tbl->rows.size() << std::endl;
+    std::vector<std::string> it = tbl.get_column_names();
+
+    std::cout << "Number of Rows: " + tbl.rows.size() << std::endl;
 
 }
 

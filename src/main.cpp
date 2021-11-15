@@ -218,7 +218,7 @@ Database* create_db(Database *db, std::string db_name){
 	return cr;
 }
 
-Table insert_into(std::string table_name, std::map<std::string, std::string> columns, std::map<std::string, std::string> values ){
+Table insert_into(std::string table_name, std::string columns,  std::string values ){
   // Seperate values from commas
   // Create a std::vector<std::string> using values
   // Database->table->insert(rows);

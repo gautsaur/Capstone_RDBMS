@@ -11,10 +11,10 @@
             "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "C:\\MinGW\\bin",
+            "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": true,
-            "console": "externalTerminal",
+            "console":"externalTerminal",
             "MIMode": "gdb",
             "miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe",
             "setupCommands": [

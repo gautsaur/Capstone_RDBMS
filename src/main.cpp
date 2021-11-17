@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <streambuf>
+#include <iostream>
 #include <regex>
 #include <cerrno>
 
@@ -22,7 +23,7 @@ Table *create_table(Database *db, std::string table_name);
 std::string table_name;
 Database *create_db(Database *db, std::string db_name);
 std::string db_name;
-void insert_into(Database *db,vector<string> split_commands);
+void insert_into(Database *db, vector<string> split_commands);
 void drop_table(Database *db, Table *tbl);
 void drop_database(Database *db);
 bool has_special_char(std::string const &str);
@@ -133,7 +134,7 @@ int main(int argc, char **argv)
         {
             table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
             vector<string> yo = split_text(statement, " (),'");
-            insert_into(db,yo);
+            insert_into(db, yo);
         }
         else if (statement.find("table info ") == 0)
         {
@@ -466,11 +467,8 @@ bool has_special_char(std::string const &s)
 
 void read_sql_file(string path)
 {
-    
-    std::ifstream in("data/testFile.sql", std::ios::in | std::ios::binary);
-    std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-    cout << content; //you can do anything with the string!!!
-    
+    string content = FileHelper::readfile("data","testFile.sql");
+
     vector<string> commands = split_text(content, ";");
     cout << commands.size();
     Database *db;
@@ -539,7 +537,7 @@ void read_sql_file(string path)
         else if (statement_lowercase.find("insert into") == 0)
         {
             vector<string> yo = split_text(statement, " (),'");
-            insert_into(db,yo);
+            insert_into(db, yo);
         }
     }
 }

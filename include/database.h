@@ -36,6 +36,8 @@ class Database {
 
 		bool find_table(std::string name);
 
+		void insert_into_table(string table_name, vector<string> cols, vector<vector<string> > data);
+
 		//Table * get_table(std::string tbl_name);
 		Table get_table(std::string tbl_name);
 				
@@ -68,32 +70,40 @@ void Database::Delete() {
 void Database::Save(){
 	std::string line;
 	std::string contents;
-	std::ofstream out("data/" + database_name + "_V2" + ".db");
+	std::ofstream out("data/" + database_name + ".db");
 
-	contents = "Database:" + database_name + "\n";
+	contents = "database:" + database_name + "\n";
 
 	auto table = tables.begin();
 
 	for( ; table != tables.end(); table++){
-		contents += ("table_name:" + table->table_name + "\n");
+		contents += ("table_name:" + table->table_name);
 
 		// Add keys
-		contents += "keys:";
-		for (auto const& key : table->keys) {
-			contents += (key.first + " " + key.second + ",");
-
+		if(table->keys.size() > 0){
+			contents += "\nkeys:";
+			for (auto const& key : table->keys) {
+				contents += (key.first + " " + key.second + ",");
+	
+			}
+			
+			contents.pop_back();
 		}
+		
 
-		contents.pop_back();
+		
 
 		// Add Columns
-		contents += "\ncolumns:";
-		for (auto const& column : table->columns) {
-			contents += (column.first + " " + column.second + ",");
-
+		if(table->columns.size() > 0){
+			contents += "\ncolumns:";
+			for (auto const& column : table->columns) {
+				contents += (column.first + " " + column.second + ",");
+	
+			}
+	
+			contents.pop_back();
 		}
-
-		contents.pop_back();
+		
 
 		// Add Rows
 		for(auto& row:table->rows){
@@ -118,6 +128,7 @@ void Database::Save(){
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
 void Database::AddTable(Table &tbl) {
 	tables.push_back(tbl);
+	
 }
 
 void Database::DropTable(std::string name) {
@@ -125,10 +136,12 @@ void Database::DropTable(std::string name) {
     for (auto& it: tables){
         if (it.table_name == name){
             tables.erase(tables.begin()+count);
+            
+            this->Save();
         }
         count = count +1;
     }
-    List_Tables();
+    
 }
 
 /// Author: Andrew Nunez
@@ -230,6 +243,80 @@ bool Database::find_table(std::string name) {
 		}
 		else return false;
 	}
+}
+
+void Database::insert_into_table(string table_name, vector<string> cols, vector<vector<string> > data) {
+	for(Table tbl : tables){
+		if(tbl.table_name == table_name){
+			// Begin Insert
+			string message;
+			
+			vector<int> indexes;
+			
+			for(vector<string> row : data){
+				if(row.size() != tbl.columns.size()){
+					message = "Row count does not match column count.";
+				}
+			}
+			
+			if(message.length() <= 0){
+				for(string u_col : cols){
+					string col = Utils::trim(u_col);
+					int index = tbl.get_column_index(col);
+					
+					
+					if(index > -1){
+						indexes.push_back(index);
+					} else {
+						message = "Invalid column name:" + col + ";";
+					}
+				}
+			}
+				
+			if(message.length() <= 0){
+				vector<string> new_row;
+				
+				for(vector<string> row : data){
+					if(row.size() == tbl.columns.size()) {
+						new_row = row;
+					} else {
+						int current_index = 0;
+						
+						for(int index : indexes){
+							
+							while(current_index < index){
+								new_row.push_back("NULL");
+								
+								current_index += 1;
+							}
+							
+							new_row.push_back(Utils::trim(row[current_index]));
+							
+							current_index += 1;
+						}
+						
+					}
+					
+					tbl.Insert(new_row);
+					
+				}
+				
+				message = "Success!";
+				
+				DropTable(table_name);
+				AddTable(tbl);
+				
+			}
+					
+			
+
+			cout << message << endl;
+
+			return;
+		}
+	}
+	
+	
 }
 
 Table Database::get_table(std::string name){

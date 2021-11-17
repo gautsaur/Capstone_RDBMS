@@ -38,7 +38,19 @@ void FileHelper::listfiles(std::string dir, std::string ext) {
 	while((dp = readdir(dirp)) != NULL) {
 				
 		if(FileHelper::CheckExtension(dp->d_name, ext)){
-			std::cout << dp->d_name << std::endl;
+			
+			
+			if(dp->d_name != ext){
+				std::string s;
+				for(char c : dp->d_name) {
+					s += c;
+				}
+				
+				s.erase(s.find(ext), ext.length());
+				
+				std::cout << s << std::endl;
+			}
+			
 		}
 		
 	}

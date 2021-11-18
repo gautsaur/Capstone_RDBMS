@@ -7,15 +7,11 @@ using namespace std;
 
 class Parser {
 	public:
-		//void static check_command(string enteredCommand, string commandToCheck);
-		//void static tokenize(std::string const &str, const char* delim, std::vector<std::string> &out);
-		//string static splitString(string str, string delimiter);
 		vector<string> static split_text(string input);
-		//void static read_sql_file();
 		vector<string> static get_select_columns(string cmd);
 		static string* split_str(std::string str, char delim);
 		vector<string> static get_create_columns(string cmd);
-		vector<pair<string, string> > get_where_clause(string cmd);
+		vector<array<string, 3> > get_where_clause(string cmd);
         vector<string> split_text(string input, string delimeter);
         vector<string> static get_insert_columns(string cmd, string table_name);
         vector<vector<string> > static get_insert_rows(string cmd, string table_name);
@@ -30,6 +26,31 @@ std::string Parser::to_lower(std::string s)
                   { c = ::tolower(c); });
 
     return s;
+}
+
+// IN DEVELOPMENT
+vector<array<string, 3> > Parser::get_where_clause(string cmd) {
+	smatch sm;
+	vector<array<string, 3> > ret;
+		
+	regex str_expr("where (.*)");
+	
+	if(regex_search(cmd, sm, str_expr)){
+		try
+		{
+			cout << sm[1] << endl;
+			
+			//ret = Utils::split(sm[1], ",");
+			
+		} catch(const std::exception& e) {
+			std::cout << "Exception: " << e.what() << std::endl;
+		}
+		
+	} else {
+		cout << "No Match!" << endl;
+	}
+			
+	return ret;
 }
 
 /// Author: Andrew

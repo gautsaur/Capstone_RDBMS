@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 	setup_intro();
 
 	Database *db;
-			
+
 	while(Parser::to_lower(cmd) != "exit") {
 		cmd = "";
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 			std::cout << "Good Bye" << std::endl;
 		} else if (statement == "help") {
 			show_help();
-		
+
 		} else if(statement.back() != ';') {
 			std::cout << "SQL command not properly terminated." << std::endl;
 		} else if(statement.find("open database ") == 0){
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 		} else if (statement.find("create database") == 0){
 		    current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
             db = new Database(current_db_name);
-		
+
 		} else if (statement == "list databases;") {
 			Database::List();
 		} else if (statement == "list tables;") {
@@ -81,15 +81,15 @@ int main(int argc, char** argv) {
 			} else {
 				db->List_Tables();
 			}
-			
+
 		} else if (statement.find("select ") == 0) {
 			// Parses the select command
 			try	{
-				
+
 				std::string tbl_name = cmd.substr(statement.find(" from") + 6);
-				
+
 				tbl_name = remove_char(tbl_name, ';');
-				
+
 				Table tbl = db->get_table(tbl_name);
 
 				cout << "Selecting from " << tbl_name << endl;
@@ -124,15 +124,15 @@ int main(int argc, char** argv) {
 		    vector<string> columns = Parser::get_create_columns(cmd);
 
 		    Table *tbl =  create_table(db, table_name, columns);
-		    
+
 		    db->AddTable(*tbl);
 		    db->Save();
 
 		} else if (statement.find("insert into") == 0) {
-            table_name = Utils::split(statement, " \n")[2];  	
+            table_name = Utils::split(statement, " \n")[2];
         	vector<vector<string> > rows = Parser::get_insert_rows(statement, table_name);
             vector<string> columns = Parser::get_insert_columns(statement, table_name);
-            
+
             db->insert_into_table(table_name, columns, rows);
         } else if(statement.find("table info ") == 0) {
 
@@ -216,6 +216,9 @@ void color(int s)
     SetConsoleTextAttribute(h, s);
 }
 
+//Janita Aamir
+//Date: mm-dd-yy
+//This function creates a new table within the current database and accepts a set of column names with types.
 Table* create_table(Database *db, std::string table_name, std::vector<std::string> columns){
 
     if (!current_db_name.empty() && has_special_char(current_db_name)!= true){
@@ -230,7 +233,7 @@ Table* create_table(Database *db, std::string table_name, std::vector<std::strin
 				if(pr.size() > 1){
 					tbl->columns.insert({pr[0], pr[1]});
 				}
-				               
+
             }
 
             return tbl;
@@ -238,6 +241,9 @@ Table* create_table(Database *db, std::string table_name, std::vector<std::strin
     }
 }
 
+//Janita Aamir
+//Date: mm-dd-yy
+//This function drops the given table from the current database.
 void drop_table(Database *db, Table* tbl){
     tbl->Delete();
 
@@ -259,22 +265,28 @@ Database *create_db(Database *db, std::string db_name)
     return cr;
 }
 
+//Janita Aamir
+//Date: mm-dd-yy
+//This function removes the given database from the data folder.
 void drop_database(string db_name){
 
     std::string s = "data/" + db_name + ".db";
 
     if (std::remove(s.c_str()) != 0){
-	
+
         perror("Error deleting file");
-    
+
 	} else {
 		puts("File successfully deleted");
 		current_db_name = "";
-		
+
 	}
-    
+
 }
 
+//Janita Aamir
+//Date: mm-dd-yy
+//This function prints out the table information (table name, column names, number of rows etc).
 void table_info(Table tbl){
     std::cout << "Table name: " + tbl.table_name << std::endl;
     std::cout << "Column names: " << std::endl;
@@ -284,6 +296,10 @@ void table_info(Table tbl){
 
 }
 
+//Janita Aamir
+//Date: mm-dd-yy
+//This function is used within create table. It checks to see if the
+//database selected has any special characters that aren't allowed.
 bool has_special_char(std::string const &s)
 {
     for (int i = 0; i < s.length(); i++)
@@ -295,11 +311,11 @@ bool has_special_char(std::string const &s)
 
 Database *read_sql_file(string path)
 {
-    
+
     std::ifstream in("data/testFile.sql", std::ios::in | std::ios::binary);
     std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     //cout << content; //you can do anything with the string!!!
-    
+
     vector<string> commands = split_text(content, ";");
     //cout << commands.size();
     Database *db;
@@ -307,9 +323,9 @@ Database *read_sql_file(string path)
     string db_name;
 
     for (auto &statement : commands)
-    {    	
+    {
     	statement = Utils::trim(statement);
-        
+
         if (Parser::to_lower(statement).rfind("create database", 0) == 0)
         {
             db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
@@ -317,29 +333,29 @@ Database *read_sql_file(string path)
             db->database_name = db_name;
         }
         else if (Parser::to_lower(statement).find("create table") == 0)
-        {        	
+        {
         	table_name = Utils::split(statement, " \n")[2];
         	table_name.erase(remove_if(table_name.begin(), table_name.end(), ::isspace), table_name.end());
         	vector<string> columns = Parser::get_create_columns(statement);
-        	        	
+
 			current_db_name = db_name;
 
             Table *tbl = create_table(db, table_name, columns);
-            
+
             db->AddTable(*tbl);
         }
         else if (Parser::to_lower(statement).find("insert into") == 0)
-        {      
-			table_name = Utils::split(statement, " \n")[2];  	
+        {
+			table_name = Utils::split(statement, " \n")[2];
         	vector<vector<string> > rows = Parser::get_insert_rows(statement, table_name);
             vector<string> columns = Parser::get_insert_columns(statement, table_name);
-            
+
             db->insert_into_table(table_name, columns, rows);
         }
     }
-    
+
     db->Save();
-    
+
     return db;
-    
+
 }

@@ -27,7 +27,7 @@ class Table {
 		std::map<std::string, std::string> columns;
 
 		/// The collection of arrays of rows for the table.
-		std::vector<std::vector<std::string> > rows;
+		std::vector<std::vector<std::string>> rows;
 		
 		void Print_Rows(std::vector<std::string> column_names);
 		
@@ -211,6 +211,7 @@ std::vector<std::vector<std::string> > Table::Select(std::vector<std::string> co
 	return rows;
 }
 
+
 // TODO: Tie into user input
 void Table::Delete() {
 	delete this;
@@ -220,7 +221,7 @@ std::vector<std::string> Table::get_column_names(){
     std::vector<std::string> temp;
     auto iter = columns.begin();
     while (iter != columns.end()) {
-		std::cout << iter ->first << "\n";
+		std::cout <<"\t- "<< iter ->first << "\n";
         temp.push_back(iter -> first);
 		iter++;
     }

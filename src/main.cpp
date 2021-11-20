@@ -277,11 +277,12 @@ void drop_database(string db_name){
 }
 
 void table_info(Table tbl){
-    std::cout << "Table name: " + tbl.table_name << std::endl;
+    std::cout << "Table name: " << tbl.table_name << std::endl;
+    std::cout << "----------------------------- " << std::endl;
     std::cout << "Column names: " << std::endl;
     std::vector<std::string> it = tbl.get_column_names();
-
-    std::cout << "Number of Rows: " + tbl.rows.size() << std::endl;
+    std::cout << "----------------------------- " << std::endl;
+    std::cout << "Number of Rows: " << tbl.rows.size() << std::endl;
 
 }
 

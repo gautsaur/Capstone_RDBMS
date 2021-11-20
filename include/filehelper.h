@@ -1,9 +1,11 @@
+#pragma once
 #include <fstream>
 #include <sstream>
 #include <dirent.h>
 #include <string.h>
 #include <iostream>
 #include <cstring>
+#include "utils.h"
 
 class FileHelper {
 	private:
@@ -37,7 +39,25 @@ void FileHelper::listfiles(std::string dir, std::string ext) {
 	while((dp = readdir(dirp)) != NULL) {
 
 		if(FileHelper::CheckExtension(dp->d_name, ext)){
-			std::cout << dp->d_name << std::endl;
+			
+			
+			if(dp->d_name != ext){
+				std::string s;
+				for(char c : dp->d_name) {
+					s += c;
+				}
+				
+				s.erase(s.find(ext), ext.length());
+				
+				if(Utils::trim(s).length() > 0){
+					std::cout << Utils::trim(s) << std::endl;
+					
+					std::cout << ";" << std::endl;
+					
+				}
+				
+			}
+			
 		}
 
 	}

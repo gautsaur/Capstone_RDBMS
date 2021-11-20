@@ -62,15 +62,11 @@ int main(int argc, char** argv) {
 		} else if(statement.back() != ';') {
 			std::cout << "SQL command not properly terminated." << std::endl;
 		} else if(statement.find("open database ") == 0){
-			current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		 	db = new Database(current_db_name);
-
-			if(db->database_name != current_db_name){
-				current_db_name = "";
-			}
-
+			
 		} else if (statement.find("create database") == 0){
-		    current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+		    current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
             db = new Database(current_db_name);
 		
 		} else if (statement == "list databases;") {
@@ -86,7 +82,7 @@ int main(int argc, char** argv) {
 			// Parses the select command
 			try	{
 				
-				std::string tbl_name = cmd.substr(statement.find(" from") + 6);
+				std::string tbl_name = cmd.substr(cmd.find(" from") + 6);
 				
 				tbl_name = remove_char(tbl_name, ';');
 				
@@ -130,10 +126,10 @@ int main(int argc, char** argv) {
 		    db->Save();
 
 		} else if (statement.find("insert into") == 0) {
-            table_name = Utils::split(statement, " \n")[2];  	
+            table_name = Utils::split(cmd, " \n")[2];
+			std::cout << table_name;	
         	vector<vector<string> > rows = Parser::get_insert_rows(statement, table_name);
             vector<string> columns = Parser::get_insert_columns(statement, table_name);
-            
             db->insert_into_table(table_name, columns, rows);
         } else if(statement.find("table info ") == 0) {
 
@@ -145,7 +141,7 @@ int main(int argc, char** argv) {
 			string table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 			db->DropTable(table_name);
 		} else if(statement.find("drop database ") == 0) {
-		    string db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+		    string db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		 	//db = new Database(current_db_name);
 		 	drop_database(db_name);
 		} else if (statement.find("load sqlfile ") == 0) {

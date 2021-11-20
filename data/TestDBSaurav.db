@@ -1,0 +1,6 @@
+database:TestDBSaurav
+table_name:Customers
+columns:City varchar,Country varchar,CustomerName varchar
+row:Cardinal,Stavanger,Norway
+row:Raven,Stockholm,Sweden
+;

@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <fstream>
 #include <streambuf>
-#include <iostream>
 #include <regex>
 #include <cerrno>
 
@@ -23,7 +22,7 @@ Table* create_table(Database *db, std::string table_name, std::vector<std::strin
 std::string table_name;
 Database *create_db(Database *db, std::string db_name);
 std::string db_name;
-void insert_into(Database *db, vector<string> split_commands);
+void insert_into(Database *db,vector<string> split_commands);
 void drop_table(Database *db, Table *tbl);
 void drop_database(string db_name);
 bool has_special_char(std::string const &str);
@@ -139,23 +138,6 @@ int main(int argc, char** argv) {
         } else if(statement.find("table info ") == 0) {
 
             table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-            vector<string> yo = split_text(statement, " (),'");
-            insert_into(db, yo);
-        }
-        else if (statement.find("table info ") == 0)
-        {
-            table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-            Table *tbl = new Table(table_name);
-            table_info(tbl);
-        }
-        else if (statement.find("drop database ") == 0)
-        {
-            current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-            db = new Database(current_db_name);
-            drop_database(db);
-        }
-        else if (statement.find("load sqlfile ") == 0)
-        {
 		    Table tbl =  db->get_table(table_name);
 		    table_info(tbl);
 
@@ -314,8 +296,11 @@ bool has_special_char(std::string const &s)
 
 Database *read_sql_file(string path)
 {
-    string content = FileHelper::readfile("data","testFile.sql");
-
+    
+    std::ifstream in("data/testFile.sql", std::ios::in | std::ios::binary);
+    std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    //cout << content; //you can do anything with the string!!!
+    
     vector<string> commands = split_text(content, ";");
     //cout << commands.size();
     Database *db;
@@ -344,10 +329,13 @@ Database *read_sql_file(string path)
             
             db->AddTable(*tbl);
         }
-        else if (statement_lowercase.find("insert into") == 0)
-        {
-            vector<string> yo = split_text(statement, " (),'");
-            insert_into(db, yo);
+        else if (Parser::to_lower(statement).find("insert into") == 0)
+        {      
+			table_name = Utils::split(statement, " \n")[2];  	
+        	vector<vector<string> > rows = Parser::get_insert_rows(statement, table_name);
+            vector<string> columns = Parser::get_insert_columns(statement, table_name);
+            
+            db->insert_into_table(table_name, columns, rows);
         }
     }
     

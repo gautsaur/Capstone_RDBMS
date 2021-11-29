@@ -5,6 +5,7 @@
 #include <string.h>
 #include <iostream>
 #include <cstring>
+#include "utils.h"
 
 class FileHelper {
 	private:
@@ -48,7 +49,13 @@ void FileHelper::listfiles(std::string dir, std::string ext) {
 				
 				s.erase(s.find(ext), ext.length());
 				
-				std::cout << s << std::endl;
+				if(Utils::trim(s).length() > 0){
+					std::cout << Utils::trim(s) << std::endl;
+					
+					std::cout << ";" << std::endl;
+					
+				}
+				
 			}
 			
 		}

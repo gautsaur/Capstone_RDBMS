@@ -97,6 +97,7 @@ int main(int argc, char** argv) {
 
 				if(tbl.table_name.length() > 0){
 					std::vector<std::string> cols = Parser::get_select_columns(cmd);
+					//Parser::get_where_clause(cmd);
 					tbl.Print_Rows(cols);
 
 				} else {

@@ -37,6 +37,8 @@ class Table {
 		
 		int GetLargestColumnSize();
 		
+		void DeleteRow(int index);
+		
 		int get_column_index(std::string column_name);
 		
 		// TODO: Add column names
@@ -201,18 +203,18 @@ void Table::AddKey(std::string key, std::string value) {
 
 }
 
-// TODO: Tie into user input
+// Inserts a row vector to the table
 void Table::Insert(std::vector<std::string> row) {
 	rows.push_back(row);
 }
 
-// TODO: Add column names
+// Selects the columns from the table
 std::vector<std::vector<std::string> > Table::Select(std::vector<std::string> col_names) {
 	return rows;
 }
 
 
-// TODO: Tie into user input
+// Deletes the table
 void Table::Delete() {
 	delete this;
 }
@@ -221,9 +223,12 @@ std::vector<std::string> Table::get_column_names(){
     std::vector<std::string> temp;
     auto iter = columns.begin();
     while (iter != columns.end()) {
-		std::cout <<"\t- "<< iter ->first << "\n";
         temp.push_back(iter -> first);
 		iter++;
     }
     return temp;
+}
+
+void Table::DeleteRow(int index){
+	rows.erase(rows.begin() + index);
 }

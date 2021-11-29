@@ -40,9 +40,9 @@ class Database {
 
 		//Table * get_table(std::string tbl_name);
 		Table get_table(std::string tbl_name);
-				
+
 		Database(){
-			
+
 		}
 
 		// Use this a the create a DB
@@ -84,26 +84,26 @@ void Database::Save(){
 			contents += "\nkeys:";
 			for (auto const& key : table->keys) {
 				contents += (key.first + " " + key.second + ",");
-	
+
 			}
-			
+
 			contents.pop_back();
 		}
-		
 
-		
+
+
 
 		// Add Columns
 		if(table->columns.size() > 0){
 			contents += "\ncolumns:";
 			for (auto const& column : table->columns) {
 				contents += (column.first + " " + column.second + ",");
-	
+
 			}
-	
+
 			contents.pop_back();
 		}
-		
+
 
 		// Add Rows
 		for(auto& row:table->rows){
@@ -128,7 +128,7 @@ void Database::Save(){
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
 void Database::AddTable(Table &tbl) {
 	tables.push_back(tbl);
-	
+
 }
 
 void Database::DropTable(std::string name) {
@@ -136,12 +136,12 @@ void Database::DropTable(std::string name) {
     for (auto& it: tables){
         if (it.table_name == name){
             tables.erase(tables.begin()+count);
-            
+
             this->Save();
         }
         count = count +1;
     }
-    
+
 }
 
 /// Author: Andrew Nunez
@@ -173,7 +173,7 @@ void Database::Read(std::string db_name) {
 			}  else if (line.find("row:") == 0) {
 				std::vector<std::string> tmp_v;
 				tmp_parent_array = Parser::split_str(line, ',');
-								
+
 				for(i = 0; i < tmp_size; i++) {
 					tmp_v.push_back(tmp_parent_array[i]);
 				}
@@ -182,10 +182,10 @@ void Database::Read(std::string db_name) {
 
 			} else if (line.find(",") != std::string::npos) {
 				tmp_parent_array = Parser::split_str(line, ',');
-				
+
 				for(i = 0; i < tmp_size; i++) {
 					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
-					
+
 					if (line.find("keys:") == 0) {
 						keys.insert({tmp_child_array[0], tmp_child_array[1]});
 
@@ -220,9 +220,9 @@ void Database::Read(std::string db_name) {
 
 	} else {
 		std::cout << "Database does not exist!" << std::endl;
-		
-	} 
-	
+
+	}
+
 }
 
 void Database::List() {
@@ -235,6 +235,9 @@ void Database::List_Tables() {
 	}
 }
 
+//Janita Aamir
+//Date: mm-dd-yy
+//This function checks to see if the given table name exists within a database.
 bool Database::find_table(std::string name) {
 	for(Table tbl : tables) {
 
@@ -250,21 +253,21 @@ void Database::insert_into_table(string table_name, vector<string> cols, vector<
 		if(tbl.table_name == table_name){
 			// Begin Insert
 			string message;
-			
+
 			vector<int> indexes;
-			
+
 			for(vector<string> row : data){
 				if(row.size() != tbl.columns.size()){
 					message = "Row count does not match column count.";
 				}
 			}
-			
+
 			if(message.length() <= 0){
 				for(string u_col : cols){
 					string col = Utils::trim(u_col);
 					int index = tbl.get_column_index(col);
-					
-					
+
+
 					if(index > -1){
 						indexes.push_back(index);
 					} else {
@@ -272,51 +275,51 @@ void Database::insert_into_table(string table_name, vector<string> cols, vector<
 					}
 				}
 			}
-				
+
 			if(message.length() <= 0){
 				vector<string> new_row;
-				
+
 				for(vector<string> row : data){
 					if(row.size() == tbl.columns.size()) {
 						new_row = row;
 					} else {
 						int current_index = 0;
-						
+
 						for(int index : indexes){
-							
+
 							while(current_index < index){
 								new_row.push_back("NULL");
-								
+
 								current_index += 1;
 							}
-							
+
 							new_row.push_back(Utils::trim(row[current_index]));
-							
+
 							current_index += 1;
 						}
-						
+
 					}
-					
+
 					tbl.Insert(new_row);
-					
+
 				}
-				
+
 				message = "Success!";
-				
+
 				DropTable(table_name);
 				AddTable(tbl);
-				
+
 			}
-					
-			
+
+
 
 			cout << message << endl;
 
 			return;
 		}
 	}
-	
-	
+
+
 }
 
 Table Database::get_table(std::string name){
@@ -329,7 +332,7 @@ Table Database::get_table(std::string name){
 			break;
 		}
 	}
-	
+
 	return ret;
-	
+
 }

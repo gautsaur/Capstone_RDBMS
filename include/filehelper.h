@@ -10,7 +10,7 @@
 class FileHelper {
 	private:
 		bool static CheckExtension(std::string filename, std::string ext);
-
+	
 	public:
 		void static listfiles(std::string dir, std::string ext);
 		std::string static readfile(std::string dir, std::string filename);
@@ -26,18 +26,18 @@ bool FileHelper::CheckExtension(std::string filename, std::string ext) {
 // Public Functions
 void FileHelper::listfiles(std::string dir, std::string ext) {
 	char cDir[dir.length()];
-
-	strcpy(cDir, dir.c_str());
-
+	
+	strcpy(cDir, dir.c_str()); 
+	
 	DIR *dirp = opendir(cDir);
 	struct dirent *dp;
 	std::string ending = ".db";
-
+	
 	std::string str = "";
-
+	
 	// TODO: return string instead of output to console
 	while((dp = readdir(dirp)) != NULL) {
-
+				
 		if(FileHelper::CheckExtension(dp->d_name, ext)){
 			
 			
@@ -48,9 +48,9 @@ void FileHelper::listfiles(std::string dir, std::string ext) {
 				}
 				
 				s.erase(s.find(ext), ext.length());
-				
+								
 				if(Utils::trim(s).length() > 0){
-					std::cout << Utils::trim(s) << std::endl;
+					std::cout << Utils::trim(s);
 					
 					std::cout << ";" << std::endl;
 					
@@ -59,28 +59,28 @@ void FileHelper::listfiles(std::string dir, std::string ext) {
 			}
 			
 		}
-
+		
 	}
 }
 
-std::string FileHelper::readfile(std::string dir,std::string filename){
-	std::string ret = "";
+std::string FileHelper::readfile(std::string dir, std::string filename){
+	std::string ret = "";	
 	std::ifstream file ("data/" + filename);
 	std::stringstream buffer;
-
+	
 	if (file.is_open()){
 		buffer << file.rdbuf();
 		ret = buffer.str();
-
+		
 		file.close();
 	}
-
+	
 	return ret;
 }
 
 std::string FileHelper::writefile(std::string contents, std::string filename, bool isbinary) {
 	std::ofstream out(filename);
-
+		
 	out << contents;
 	out.close();
 }

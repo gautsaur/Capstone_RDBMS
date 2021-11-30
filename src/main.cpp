@@ -15,7 +15,6 @@ void setup_intro();
 void show_help();
 void print_rows(Table tbl);
 std::string to_lower(std::string str);
-std::string remove_char(std::string str, char delim);
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 std::string current_db_name;
 Table* create_table(Database *db, std::string table_name, std::vector<std::string> columns);
@@ -88,7 +87,7 @@ int main(int argc, char** argv) {
 
 				std::string tbl_name = cmd.substr(statement.find(" from") + 6);
 
-				tbl_name = remove_char(tbl_name, ';');
+				tbl_name = Utils::remove_char(tbl_name, ';');
 
 				Table tbl = db->get_table(tbl_name);
 
@@ -160,12 +159,7 @@ int main(int argc, char** argv) {
 }
 
 
-std::string remove_char(std::string str, char delim)
-{
-    str.erase(std::remove(str.begin(), str.end(), delim), str.end());
 
-    return str;
-}
 
 /// Shows the help menu
 void show_help()

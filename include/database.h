@@ -253,7 +253,16 @@ void Database::insert_into_table(string table_name, vector<string> cols, vector<
 			
 			vector<int> indexes;
 			
+			
+			
 			for(vector<string> row : data){
+				
+				cout << "Row Size: " << row.size() << "\t Column Size: " << tbl.columns.size() << endl;
+				
+				for(string val : row){
+					cout << "Value: " << val << endl;
+				}
+				
 				if(row.size() != tbl.columns.size()){
 					message = "Row count does not match column count.";
 				}

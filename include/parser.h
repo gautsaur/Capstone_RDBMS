@@ -78,13 +78,18 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	smatch sm;
 	vector<string> ret;
 
-	regex str_expr("insert into " + table_name + " \\((.*)\\)", regex::icase);
+	//regex str_expr("insert into " + table_name + " \\((.*)\\)", regex::icase);
+	regex str_expr(R"(insert into " + table_name + "(?:\s*\()(.*)\)(?:\s*)values)", regex::icase);
 
 	// Check if the match was found, and add to the vector
 	if(regex_search(cmd, sm, str_expr)){
 		try
 		{
 			ret = Utils::split(sm[1], ",");
+			
+			for(int i = 0; i < sm.size(); i += 1){
+				cout << "Column Group:\t" << sm[i] << endl;
+			}
 
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
@@ -105,16 +110,23 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 	vector<vector<string> > ret;
 	cmd.erase(std::remove(cmd.begin(), cmd.end(), '\n'), cmd.end());
 
-	regex str_expr(R"(values (.*))", regex_constants::icase);
+	regex str_expr(R"(values(?:\s*)\(([^()]+)\))", regex_constants::icase);
 
 	// Check if the match was found, and add to the vector
 	if(regex_search(cmd, sm, str_expr)){
 		try
 		{			
+			for(int i = 0; i < sm.size(); i += 1){
+				cout << "Row Group:\t" << sm[i] << endl;
+			}
+		
 			vector<string> rows = Utils::split(sm[1], ")(");
 			
 			for(string row : rows){
-				vector<string> values = Utils::split(row, ", '");
+				row = Utils::remove_char(row, '\'');
+				row = Utils::remove_char(row, '"');
+				
+				vector<string> values = Utils::split(row, ",");
 				
 				if(values.size() > 0){					
 					ret.push_back(values);

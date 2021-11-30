@@ -37,6 +37,12 @@ namespace Utils {
         return results;
     }
     
+    std::string remove_char(std::string str, char delim)
+	{
+	    str.erase(std::remove(str.begin(), str.end(), delim), str.end());
+	
+	    return str;
+	}
     
 	std::string ltrim(const std::string &s)
 	{

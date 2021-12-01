@@ -35,33 +35,17 @@ class Database {
 
 		//Table * get_table(std::string tbl_name);
 		Table get_table(std::string tbl_name);
-
+				
 		Database();
 
 		// Use this a the create a DB
 		// TODO: Tie into user input
 		Database(std::string name) {
-			this->database_name = name;
+			Read(name);
+
 		}
 
 };
-
-/// Author: Andrew
-/// Date: 09-28-2021
-/// Splits the provided string on the specified delimiter
-std::string* split_str(std::string str, char delim){
-	int size = std::count(str.begin(), str.end(), delim) + 1;
-	std::string* ret = new std::string[size];
-	int i = 0;
-	std::stringstream ssin(str.substr(str.find(":") + 1));
-
-	while(ssin.good() && i < size) {
-		getline(ssin, ret[i], delim);
-		++i;
-	}
-
-	return ret;
-}
 
 /// Author: Andrew Nunez
 /// Date: 09-28-2021
@@ -131,16 +115,6 @@ void Database::AddTable(Table &tbl) {
 	tables.push_back(tbl);
 }
 
-void Database::DropTable(std::string name) {
-    int count = 0;
-    for (auto& it: tables){
-        if (it.table_name == name){
-            tables.erase(tables.begin()+count);
-        }
-        count = count +1;
-    }
-}
-
 /// Author: Andrew Nunez
 /// Date: 09-28-2021
 /// Reads the given file name and initializes an object from the contents
@@ -169,8 +143,8 @@ void Database::Read(std::string db_name) {
 
 			}  else if (line.find("row:") == 0) {
 				std::vector<std::string> tmp_v;
-				tmp_parent_array = split_str(line, ',');
-
+				tmp_parent_array = Parser::split_str(line, ',');
+								
 				for(i = 0; i < tmp_size; i++) {
 					tmp_v.push_back(tmp_parent_array[i]);
 				}
@@ -178,11 +152,11 @@ void Database::Read(std::string db_name) {
 				rows.push_back(tmp_v);
 
 			} else if (line.find(",") != std::string::npos) {
-				tmp_parent_array = split_str(line, ',');
-
+				tmp_parent_array = Parser::split_str(line, ',');
+				
 				for(i = 0; i < tmp_size; i++) {
-					tmp_child_array = split_str(tmp_parent_array[i], ' ');
-
+					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+					
 					if (line.find("keys:") == 0) {
 						keys.insert({tmp_child_array[0], tmp_child_array[1]});
 
@@ -217,9 +191,9 @@ void Database::Read(std::string db_name) {
 
 	} else {
 		std::cout << "Database does not exist!" << std::endl;
-
-	}
-
+		
+	} 
+	
 }
 
 void Database::List() {
@@ -242,7 +216,7 @@ Table Database::get_table(std::string name){
 			break;
 		}
 	}
-
+	
 	return ret;
-
+	
 }

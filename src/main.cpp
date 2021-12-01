@@ -13,7 +13,7 @@
 void color(int s);
 void setup_intro();
 void show_help();
-//void print_rows(Table tbl);
+void print_rows(Table tbl);
 std::string to_lower(std::string str);
 std::string remove_char(std::string str, char delim);
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -26,138 +26,111 @@ void insert_into(Database *db,vector<string> split_commands);
 void drop_table(Database *db, Table *tbl);
 void drop_database(Database *db);
 bool has_special_char(std::string const &str);
-void table_info(Table *tbl);
+void table_info(Table* tbl);
 void read_sql_file(string path);
 
-int main(int argc, char **argv)
-{
-    std::string cmd;
+int main(int argc, char** argv) {
+	std::string cmd;
 
-    setup_intro();
+	setup_intro();
 
-    Database *db;
+	Database *db;
+			
+	while(to_lower(cmd) != "exit") {
+		cmd = "";
+				
+		// Setup the command to wait for input
+		color(10);
+		if(current_db_name.length() > 0) {
+			std::cout << current_db_name << "@";
+		}
+			
+		std::cout << "SQL>";
+		color(7);
+		std::getline(std::cin, cmd);
+		std::string statement = to_lower(cmd);
+		
+		
+		// SELECT [ID, TEST, ] FROM TABLE;
 
-    while (to_lower(cmd) != "exit")
-    {
-        cmd = "";
+		// Do something with cmd
+		if (statement == "exit"){
+			std::cout << "Good Bye" << std::endl;
+		} else if (statement == "help") {
+			show_help();
+		
+		} else if(statement.back() != ';') {
+			std::cout << "SQL command not properly terminated." << std::endl;
+		} else if(statement.find("open database ") == 0){
+			current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+		 	db = new Database(current_db_name);
 
-        // Setup the command to wait for input
-        color(10);
-        if (current_db_name.length() > 0)
-        {
-            std::cout << current_db_name << "@";
-        }
+			if(db->database_name != current_db_name){
+				current_db_name = "";
+			}
 
-        std::cout << "SQL>";
-        color(7);
-        std::getline(std::cin, cmd);
-        std::string statement = to_lower(cmd);
-
-        // SELECT [ID, TEST, ] FROM TABLE;
-
-        // Do something with cmd
-        if (statement == "exit")
-        {
-            std::cout << "Good Bye" << std::endl;
-        }
-        else if (statement == "help")
-        {
-            show_help();
-        }
-        else if (statement.back() != ';')
-        {
-            std::cout << "SQL command not properly terminated." << std::endl;
-        }
-        else if (statement.find("open database ") == 0)
-        {
-            current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+		} else if (statement.find("create database") == 0){
+		    current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
             db = new Database(current_db_name);
+		
+		} else if (statement == "list database") {
+			Database::List();
+		} else if (statement == "list tables;") {
+			if(current_db_name.length() == 0) {
+				std::cout << "Open a database first." << std::endl;
+			} else {
+				db->List_Tables();
+			}
+			
+		} else if (statement.find("select ") == 0) {
+			// Parses the select command
+			try	{
+				
+				std::string tbl_name = statement.substr(statement.find(" from") + 6);
+				
+				tbl_name = remove_char(tbl_name, ';');
+				
+				Table tbl = db->get_table(tbl_name);
+								
+				if(tbl.table_name.length() > 0){
+					std::vector<std::string> cols = Parser::get_select_columns(statement);
+					tbl.Print_Rows(cols);
+					
+				} else {
+					std::cout << "Table does not exist." << std::endl;
+				}
+				
+			} catch(const std::exception&) {
 
-            if (db->database_name != current_db_name)
-            {
-                current_db_name = "";
-            }
-        }
-        else if (statement.find("create database") == 0)
-        {
-            current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-            db = new Database(current_db_name);
-        }
-        else if (statement == "list database;")
-        {
-            Database::List();
-        }
-        else if (statement == "list tables;")
-        {
-            if (current_db_name.length() == 0)
-            {
-                std::cout << "Open a database first." << std::endl;
-            }
-            else
-            {
-                db->List_Tables();
-            }
-        }
-        else if (statement.find("select ") == 0)
-        {
-            // Parses the select command
-            try
-            {
+			}
+		
+		}  else if(statement.find("create table ") == 0){
+		    table_name = statement.substr(statement.find_last_of(' ' ) + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+		    //Table *tbl = new create_table(current_db_name, table_name, );
+		    std::vector<std::string> cols = Parser::get_create_columns(statement);
 
-                std::string tbl_name = statement.substr(statement.find(" from") + 6);
-
-                tbl_name = remove_char(tbl_name, ';');
-
-                Table tbl = db->get_table(tbl_name);
-
-                if (tbl.table_name.length() > 0)
-                {
-                    std::vector<std::string> cols = Parser::get_select_columns(statement);
-                    tbl.Print_Rows(cols);
-                }
-                else
-                {
-                    std::cout << "Table does not exist." << std::endl;
-                }
-            }
-            catch (const std::exception &)
-            {
-            }
-        }
-        else if (statement.find("create table ") == 0)
-        {
-            table_name = cmd.substr(cmd.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
-            //Table *tbl = new create_table(current_db_name, table_name, );
-        }
-        else if (statement.find("insert into") == 0)
-        {
+		} else if (statement.find("insert into") == 0) {
             table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
             vector<string> yo = split_text(statement, " (),'");
             insert_into(db,yo);
-        }
-        else if (statement.find("table info ") == 0)
-        {
-            table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-            Table *tbl = new Table(table_name);
-            table_info(tbl);
-        }
-        else if (statement.find("drop database ") == 0)
-        {
-            current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-            db = new Database(current_db_name);
-            drop_database(db);
-        }
-        else if (statement.find("load sqlfile ") == 0)
-        {
+        } else if(statement.find("table info ") == 0) {
+		    table_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+		    Table *tbl =  new Table(table_name);
+		    table_info(tbl);
+
+		} else if(statement.find("drop database ") == 0) {
+		    current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+		 	db = new Database(current_db_name);
+		 	drop_database(db);
+		} else if (statement.find("load sqlfile ") == 0) {
             string target_file_path = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
             read_sql_file(target_file_path);
-        }
-        else
-        {
-            std::cout << "Invalid Command." << std::endl;
-        }
-    }
-    return 0;
+        } else {
+			std::cout << "Invalid Command." << std::endl;
+		}
+	}
+
+	return 0;
 }
 
 /// Converts a string to lower

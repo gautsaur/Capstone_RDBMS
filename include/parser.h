@@ -2,7 +2,7 @@
 #include <fstream>
 #include <regex>
 #include <bits/stdc++.h>
-#include "../include/utils.h"
+#include "utils.h"
 using namespace std;
 
 class Parser {
@@ -100,4 +100,3 @@ std::vector<std::string> split_text(std::string input, std::string delimeter)
     auto results = Utils::split(input, delimeter);
     return results;
 }
-

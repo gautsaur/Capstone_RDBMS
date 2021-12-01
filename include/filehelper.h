@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <iostream>
+#include <stdio.h>
 #include <cstring>
 #include "utils.h"
 
@@ -24,43 +25,31 @@ bool FileHelper::CheckExtension(std::string filename, std::string ext) {
 }
 
 // Public Functions
-void FileHelper::listfiles(std::string dir, std::string ext) {
-	char cDir[dir.length()];
-	
-	strcpy(cDir, dir.c_str()); 
-	
-	DIR *dirp = opendir(cDir);
-	struct dirent *dp;
-	std::string ending = ".db";
-	
-	std::string str = "";
-	
-	// TODO: return string instead of output to console
-	while((dp = readdir(dirp)) != NULL) {
-				
-		if(FileHelper::CheckExtension(dp->d_name, ext)){
-			
-			
-			if(dp->d_name != ext){
-				std::string s;
-				for(char c : dp->d_name) {
-					s += c;
-				}
-				
-				s.erase(s.find(ext), ext.length());
-								
-				if(Utils::trim(s).length() > 0){
-					std::cout << Utils::trim(s);
-					
-					std::cout << ";" << std::endl;
-					
-				}
-				
-			}
-			
-		}
-		
-	}
+void FileHelper::listfiles(std::string directory, std::string ext) {
+	DIR *di;
+    char *ptr1,*ptr2;
+    int retn;
+    struct dirent *dir;
+    const char * direc = directory.c_str();
+    const char *extension = ext.c_str();
+    di = opendir(direc); //specify the directory name
+    if (di)
+    {
+        while ((dir = readdir(di)) != NULL)
+        {
+            ptr1=strtok(dir->d_name,".");
+            ptr2=strtok(NULL,".");
+            if(ptr2!=NULL)
+            {
+                retn=strcmp(ptr2,extension);
+                if(retn==0)
+                {
+                    printf("> %s\n",ptr1);
+                }
+            }
+        }
+        closedir(di);
+    }
 }
 
 std::string FileHelper::readfile(std::string dir, std::string filename){

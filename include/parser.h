@@ -1,4 +1,6 @@
 #pragma once
+#include "database.h"
+
 #include <fstream>
 #include <regex>
 #include <bits/stdc++.h>
@@ -16,7 +18,6 @@ class Parser {
         vector<string> static get_insert_columns(string cmd, string table_name);
         vector<vector<string> > static get_insert_rows(string cmd, string table_name);
         std::string static to_lower(std::string s);
-
 };
 
 /// Converts a string to lower

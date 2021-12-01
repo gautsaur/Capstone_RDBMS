@@ -37,6 +37,8 @@ class Table {
 		
 		int GetLargestColumnSize();
 		
+		int get_column_index(std::string column_name);
+		
 		// TODO: Add column names
 		std::vector<std::vector<std::string> > Select(std::vector<std::string> col_names);
 
@@ -78,6 +80,21 @@ int Table::GetLargestColumnSize() {
 	return ret;
 	
 }
+
+int Table::get_column_index(std::string column_name){
+	int ret = -1;
+	std::map<std::string, std::string>::iterator it;
+	int col_index;
+	
+	it = columns.find(column_name);
+			
+	if(it != columns.end()) {			
+		col_index = std::distance(columns.begin(), it);
+		ret = col_index;
+	} 
+	
+	return ret;
+} 
 
 void Table::Print_Rows(std::vector<std::string> column_names){
 	int row_count = 0;

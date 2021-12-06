@@ -22,12 +22,14 @@ HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 std::string current_db_name;
 Table *create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info);
 std::string table_name;
+Database *create_db(Database *db, std::string db_name);
 std::string db_name;
 void insert_into(Database *db, vector<string> split_commands);
 void drop_table(Database *db, Table *tbl);
 void drop_database(string db_name);
 bool has_special_char(std::string const &str);
 void table_info(Table tbl);
+void schema_info(Database db);
 Database *read_sql_file(string path);
 
 int main(int argc, char **argv)
@@ -128,7 +130,7 @@ int main(int argc, char **argv)
 		{
 			table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 			Table *tbl = new Table(table_name);
-			db->AddTable(tbl);
+			db->AddTable(*tbl);
 		}
 		else if (statement.find("insert into") == 0)
 		{
@@ -319,6 +321,15 @@ Table *create_table(std::string table_name, std::vector<pair<std::string, std::s
 	return tbl;
 }
 
+/// Author: Sanjeev Thakur
+/// Creates database 
+Database *create_db(Database *db, std::string db_name)
+{
+    Database *cr = new Database(db_name);
+    db->Save();
+    return cr;
+}
+
 void drop_table(Database *db, Table *tbl)
 {
 	tbl->Delete();
@@ -370,6 +381,18 @@ void table_info(Table tbl)
 	std::cout << "----------------------------- " << std::endl;
 	std::cout << "Number of Rows: " << tbl.rows.size() << std::endl;
 }
+/*
+/// Author: Sanjeev Thakur
+/// List names of all the databases
+/// Status: Incomplete
+void schema_info(Database db){
+	std::cout << "Database name: " << db.database_name << std::endl;
+    std::cout << "----------------------------- " << std::endl;
+	
+	
+
+}
+*/
 
 bool has_special_char(std::string const &s)
 {

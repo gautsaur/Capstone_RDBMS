@@ -28,6 +28,7 @@ void drop_database(string db_name);
 bool has_special_char(std::string const &str);
 void table_info(Table tbl);
 Database *read_sql_file(string path);
+void update_table(Database *db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable);
 
 int main(int argc, char **argv)
 {
@@ -154,7 +155,11 @@ int main(int argc, char **argv)
 		{
 			string target_file_path = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 			db = read_sql_file(target_file_path);
-		}
+		} else if (statement.find("update ") == 0) {
+            //UPDATE [table_name] set Name = "new name" WHERE ID = 1;
+            //update_table(db, table_name, col1Name, newValue, col2Name, forValue);
+
+        }
 		else if (statement.find("delete from ") == 0)
 		{
 			vector<string> splitTexts = split_text(statement, " (),'");
@@ -301,6 +306,31 @@ void setup_intro()
 void color(int s)
 {
 	SetConsoleTextAttribute(h, s);
+}
+
+
+//Janita Aamir
+//mm-dd-yy
+//This function updates an existing value with a new one given the column names and specific row.
+//UPDATE [table_name] set Name = "new name" WHERE ID = 1;
+void update_table(Database *db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable){
+    Table tbl = db->get_table(table_name);
+
+    int col1Index = tbl.get_column_index(col1);
+    int col2Index = tbl.get_column_index(col2);
+
+    std::vector<std::string>::const_iterator col;
+    std::vector<std::vector<std::string> > rows = tbl.rows;
+
+
+    for(std::vector<std::string> row : rows) {
+        if (row[col2Index] ==  forVariable){
+                row[col1Index] = toUpdate;
+        }
+
+    }
+
+
 }
 
 //Janita Aamir

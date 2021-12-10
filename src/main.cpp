@@ -153,6 +153,7 @@ int main(int argc, char** argv) {
             string target_file_path = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
             db = read_sql_file(target_file_path);
         } else if (statement.find("update ") == 0) {
+            //UPDATE [table_name] set Name = "new name" WHERE ID = 1;
             //update_table(db, table_name, col1Name, newValue, col2Name, forValue);
 
         }else {

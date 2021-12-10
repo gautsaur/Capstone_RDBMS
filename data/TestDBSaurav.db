@@ -2,5 +2,4 @@ database:TestDBSaurav
 table_name:Customers
 columns:City string,Country string,CustomerName string
 row:Stavanger,Norway,Cardinal
-row:Stockholm,Sweden,Raven
 ;

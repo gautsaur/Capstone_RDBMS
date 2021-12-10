@@ -407,8 +407,6 @@ void Database::insert_into(std::string statement)
 		std::for_each(it_lowercase.begin(), it_lowercase.end(), [](char &c)
 					  { c = ::tolower(c); });
 					  
-		cout<< it<<"\n";
-
 		if (count == 2)
 		{
 			std::string table_name = it;
@@ -467,6 +465,7 @@ void Database::insert_into(std::string statement)
 
 			for (int j = 0; j < order.size(); j++)
 			{
+				cout << order[j]<<"\n";
 				if (order[j] == -1)
 				{
 					temp.push_back("NULL");

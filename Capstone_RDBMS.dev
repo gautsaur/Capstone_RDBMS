@@ -100,9 +100,6 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit7]
-FileName=include\parser.h
-
 [Unit5]
 FileName=include\utils.h
 CompileCpp=1

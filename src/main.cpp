@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 		{
 			table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 			Table *tbl = new Table(table_name);
-			db->AddTable(tbl);
+			db->AddTable(*tbl);
 		}
 		else if (statement.find("insert into") == 0)
 		{

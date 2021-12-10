@@ -18,6 +18,7 @@ class Parser {
         vector<string> static get_insert_columns(string cmd, string table_name);
         vector<vector<string> > static get_insert_rows(string cmd, string table_name);
         std::string static to_lower(std::string s);
+        vector<vector<string> > get_update_clause(string cmd);
 };
 
 /// Converts a string to lower
@@ -29,7 +30,43 @@ std::string Parser::to_lower(std::string s)
     return s;
 }
 
-// IN DEVELOPMENT
+/// Author: Andrew
+/// Date: 11-28-2021
+/// Parses an update command
+vector<vector<string> > Parser::get_update_clause(string cmd) {
+	smatch sm;
+	vector<vector<string> > ret;
+	vector<string> values;
+		
+	regex str_expr("set(?:\\s*)(.*)(?:\\s*where)");
+	
+	if(regex_search(cmd, sm, str_expr)){
+		try
+		{			
+			values = Utils::split(sm[1], ",");
+			
+			for(string value : values) {
+				vector<string> temp = Utils::split("=");
+				
+				ret.push_back(temp);
+				
+			}
+			
+		} catch(const std::exception& e) {
+			std::cout << "Exception: " << e.what() << std::endl;
+		}
+		
+	} else {
+		cout << "No Match!" << endl;
+	}
+			
+	return ret;
+	
+}
+
+/// Author: Andrew
+/// Date: 11-28-2021
+/// Get's the where clause parameters for a select or update statement
 vector<array<string, 3> > Parser::get_where_clause(string cmd) {
 	smatch sm;
 	vector<array<string, 3> > ret;

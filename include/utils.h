@@ -60,4 +60,15 @@ namespace Utils {
 	    return rtrim(ltrim(s));
 	}	
 	
+	bool contains(std::string str, std::string subStr){
+		bool ret = false;
+		
+		if (str.find(subStr) != std::string::npos) {
+		    ret = true;
+		}
+		
+		return ret;
+		
+	}
+	
 }// http://programmingnotes.org/

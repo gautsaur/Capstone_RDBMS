@@ -367,6 +367,7 @@ Table Database::get_table(std::string name)
 	return ret;
 }
 
+
 /// Author: Saurav Gautam
 /// Save the table after being updated in the console
 /// Replaces the table by creating a new one

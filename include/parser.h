@@ -70,6 +70,7 @@ vector<vector<string> > Parser::get_update_clause(string cmd) {
 vector<array<string, 3> > Parser::get_where_clause(string cmd) {
 	smatch sm;
 	vector<array<string, 3> > ret;
+	vector<string> tmp;
 		
 	regex str_expr("where (.*)");
 	
@@ -78,7 +79,7 @@ vector<array<string, 3> > Parser::get_where_clause(string cmd) {
 		{
 			cout << sm[1] << endl;
 			
-			//ret = Utils::split(sm[1], ",");
+			tmp = Utils::split(sm[1], ",");
 			
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;

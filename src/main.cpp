@@ -162,38 +162,36 @@ int main(int argc, char **argv)
         }
 		else if (statement.find("delete from ") == 0)
 		{
-			vector<string> splitTexts = split_text(statement, " (),'");
+			vector<string> splitTexts = split_text(cmd, " (),';");
 
-			if (splitTexts[0] != "delete" && splitTexts[1] != "from")
+			if (Parser::to_lower(splitTexts[0]) != "delete" && Parser::to_lower(splitTexts[1]) != "from")
 			{
 				continue;
 			}
 			else
 			{
-				string conditional = splitTexts[4];
-				string value = splitTexts[5];
+				string conditional = splitTexts[5];
+				string value = splitTexts[6];
 				Table currentTable = db->get_table(splitTexts[2]);
-				int col_ndx = currentTable.get_column_index(splitTexts[3]);
+				int col_ndx = currentTable.get_column_index(splitTexts[4]);
 				int row_len = currentTable.rows.size();
+				
+				cout<< "Conditional = " <<conditional <<"\n";
+				cout<< "Value = " <<value <<"\n";
+				cout<< "col_ndx = " <<col_ndx <<"\n";
+				cout<< "row_len = " <<row_len <<"\n";
 				for (int i = 0; i < row_len; i++)
 				{
-					if(conditional == "="){					
+					if(conditional == "=="){
+						cout<< "Comparing Value = " << currentTable.rows[i][col_ndx]<<"\n";
 						if (currentTable.rows[i][col_ndx] == value)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
 						}
 					}else if(conditional ==">="){
 						if (currentTable.rows[i][col_ndx] >= value)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
 						}
 					}
 					else if(conditional =="<="){
@@ -201,19 +199,11 @@ int main(int argc, char **argv)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
 						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
-						}
 					}
 					else if(conditional ==">"){
 						if (currentTable.rows[i][col_ndx] > value)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
 						}
 					}
 					else if(conditional =="<"){
@@ -221,18 +211,11 @@ int main(int argc, char **argv)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
 						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
-						}
+					
 					}else if(conditional =="!="){
 						if (currentTable.rows[i][col_ndx] != value)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
 						}
 					}else{
 						std::cout << "Given conditional statement is not supported!" << std::endl;

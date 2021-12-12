@@ -18,7 +18,7 @@ class Parser {
         vector<string> static get_insert_columns(string cmd, string table_name);
         vector<vector<string> > static get_insert_rows(string cmd, string table_name);
         std::string static to_lower(std::string s);
-        vector<vector<string> > get_update_clause(string cmd);
+        vector<vector<string> > static get_update_clause(string cmd);
 };
 
 /// Converts a string to lower
@@ -37,31 +37,31 @@ vector<vector<string> > Parser::get_update_clause(string cmd) {
 	smatch sm;
 	vector<vector<string> > ret;
 	vector<string> values;
-		
+
 	regex str_expr("set(?:\\s*)(.*)(?:\\s*where)");
-	
+
 	if(regex_search(cmd, sm, str_expr)){
 		try
-		{			
+		{
 			values = Utils::split(sm[1], ",");
-			
+
 			for(string value : values) {
 				vector<string> temp = Utils::split("=");
-				
+
 				ret.push_back(temp);
-				
+
 			}
-			
+
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}
-		
+
 	} else {
 		cout << "No Match!" << endl;
 	}
-			
+
 	return ret;
-	
+
 }
 
 /// Author: Andrew
@@ -71,24 +71,24 @@ vector<array<string, 3> > Parser::get_where_clause(string cmd) {
 	smatch sm;
 	vector<array<string, 3> > ret;
 	vector<string> tmp;
-		
+
 	regex str_expr("where (.*)");
-	
+
 	if(regex_search(cmd, sm, str_expr)){
 		try
 		{
 			cout << sm[1] << endl;
-			
+
 			tmp = Utils::split(sm[1], ",");
-			
+
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}
-		
+
 	} else {
 		cout << "No Match!" << endl;
 	}
-			
+
 	return ret;
 }
 
@@ -125,7 +125,7 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 		try
 		{
 			ret = Utils::split(sm[1], ",");
-			
+
 			for(int i = 0; i < sm.size(); i += 1){
 				cout << "Column Group:\t" << sm[i] << endl;
 			}
@@ -137,7 +137,7 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	} else {
 		cout << "Insert Columns: No Match!" << endl;
 	}
-	
+
 	return ret;
 }
 
@@ -154,25 +154,25 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 	// Check if the match was found, and add to the vector
 	if(regex_search(cmd, sm, str_expr)){
 		try
-		{			
+		{
 			for(int i = 0; i < sm.size(); i += 1){
 				cout << "Row Group:\t" << sm[i] << endl;
 			}
-		
+
 			vector<string> rows = Utils::split(sm[1], ")(");
-			
+
 			for(string row : rows){
 				row = Utils::remove_char(row, '\'');
 				row = Utils::remove_char(row, '"');
-				
+
 				vector<string> values = Utils::split(row, ",");
-				
-				if(values.size() > 0){					
+
+				if(values.size() > 0){
 					ret.push_back(values);
 				}
-				
+
 			}
-			
+
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}

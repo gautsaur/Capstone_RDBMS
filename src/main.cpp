@@ -154,7 +154,10 @@ int main(int argc, char** argv) {
             db = read_sql_file(target_file_path);
         } else if (statement.find("update ") == 0) {
             //UPDATE [table_name] set Name = "new name" WHERE ID = 1;
-            //update_table(db, table_name, col1Name, newValue, col2Name, forValue);
+            std::string tbl_name = table_name = Utils::split(statement, " \n")[1];
+            vector<vector<string> > columns = Parser::get_update_clause(statement);
+
+            //update_table(db, tbl_name);
 
         }else {
 			std::cout << "Invalid Command." << std::endl;

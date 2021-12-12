@@ -129,7 +129,9 @@ int main(int argc, char **argv)
 		}
 		else if (statement.find("insert into") == 0)
 		{
-			db->insert_into(cmd);
+			//table_name = Utils::trim(cmd.substr(cmd.find("into ") + 5, cmd.find_first_of('(') - cmd.find("into ") + 5));
+			table_name = Utils::get_string_between_two_strings(cmd, "into ", "(");
+			db->insert_into(cmd, table_name);
 			db->Save();
 		}
 		else if (statement.find("table info ") == 0)
@@ -162,36 +164,38 @@ int main(int argc, char **argv)
         }
 		else if (statement.find("delete from ") == 0)
 		{
-			vector<string> splitTexts = split_text(cmd, " (),';");
+			vector<string> splitTexts = split_text(statement, " (),'");
 
-			if (Parser::to_lower(splitTexts[0]) != "delete" && Parser::to_lower(splitTexts[1]) != "from")
+			if (splitTexts[0] != "delete" && splitTexts[1] != "from")
 			{
 				continue;
 			}
 			else
 			{
-				string conditional = splitTexts[5];
-				string value = splitTexts[6];
+				string conditional = splitTexts[4];
+				string value = splitTexts[5];
 				Table currentTable = db->get_table(splitTexts[2]);
-				int col_ndx = currentTable.get_column_index(splitTexts[4]);
+				int col_ndx = currentTable.get_column_index(splitTexts[3]);
 				int row_len = currentTable.rows.size();
-				
-				cout<< "Conditional = " <<conditional <<"\n";
-				cout<< "Value = " <<value <<"\n";
-				cout<< "col_ndx = " <<col_ndx <<"\n";
-				cout<< "row_len = " <<row_len <<"\n";
 				for (int i = 0; i < row_len; i++)
 				{
-					if(conditional == "=="){
-						cout<< "Comparing Value = " << currentTable.rows[i][col_ndx]<<"\n";
+					if(conditional == "="){					
 						if (currentTable.rows[i][col_ndx] == value)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
+						}
+						else
+						{
+							std::cout << "No such value for WHERE clause." << std::endl;
 						}
 					}else if(conditional ==">="){
 						if (currentTable.rows[i][col_ndx] >= value)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
+						}
+						else
+						{
+							std::cout << "No such value for WHERE clause." << std::endl;
 						}
 					}
 					else if(conditional =="<="){
@@ -199,11 +203,19 @@ int main(int argc, char **argv)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
 						}
+						else
+						{
+							std::cout << "No such value for WHERE clause." << std::endl;
+						}
 					}
 					else if(conditional ==">"){
 						if (currentTable.rows[i][col_ndx] > value)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
+						}
+						else
+						{
+							std::cout << "No such value for WHERE clause." << std::endl;
 						}
 					}
 					else if(conditional =="<"){
@@ -211,11 +223,18 @@ int main(int argc, char **argv)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
 						}
-					
+						else
+						{
+							std::cout << "No such value for WHERE clause." << std::endl;
+						}
 					}else if(conditional =="!="){
 						if (currentTable.rows[i][col_ndx] != value)
 						{
 							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
+						}
+						else
+						{
+							std::cout << "No such value for WHERE clause." << std::endl;
 						}
 					}else{
 						std::cout << "Given conditional statement is not supported!" << std::endl;
@@ -495,7 +514,7 @@ Database *read_sql_file(string path)
 		}
 		else if (statement_lowercase.find("insert into") == 0)
 		{
-			db->insert_into(statement);
+			db->insert_into(statement, table_name);
 		}
 	}
 	db->Save();

@@ -42,7 +42,7 @@ public:
 
 	void insert_into_table(string table_name, vector<string> cols, vector<vector<string>> data);
 
-	void insert_into(std::string statement);
+	void insert_into(std::string statement, std::string table_name);
 
 	Table get_table(std::string tbl_name);
 
@@ -392,93 +392,58 @@ void Database::SaveTable(Table table)
 
 /// Author: Saurav Gautam
 /// Read the insert statement and insert values in the table
-void Database::insert_into(std::string statement)
+void Database::insert_into(std::string statement, std::string table_name)
 {
-	vector<string> split_statements = split_text(statement, " (),';");
-	Table current_table;
-	vector<string> columns;
-	bool columnSet = false;
-	vector<string> values;
-	int count = 0;
-	for (auto &it : split_statements)
-	{
+	cout << "Beginning Insert for:" << table_name << ";" << endl;
+	Table current_table = get_table(table_name);;
+	vector<string> columns = Parser::get_insert_columns(statement, table_name);
+	vector<vector<string> > values = Parser::get_insert_rows(statement, table_name);	
 
-		string it_lowercase = it;
-		std::for_each(it_lowercase.begin(), it_lowercase.end(), [](char &c)
-					  { c = ::tolower(c); });
-					  
-		if (count == 2)
+	vector<string> col_names = current_table.get_column_names();
+
+	vector<int> order;
+
+	cout << "Beginning Column sorting" << endl;
+
+	for (int i = 0; i < columns.size(); i++)
+	{
+		auto itr = std::find(columns.begin(), columns.end(), col_names.at(i));
+		if (itr != columns.cend())
 		{
-			std::string table_name = it;
-			current_table = get_table(table_name);
+
+			order.push_back((std::distance(columns.begin(), itr)));
 		}
-		if (it_lowercase == "values")
+		else
 		{
-			columnSet = true;
-			continue;
+			order.push_back(-1);
 		}
-		if (count > 2)
+	}
+
+	int cnt = 0;
+
+	cout << "Done. Beginning row Sorting" << endl;
+
+	for(vector<string> row : values)
+	{
+		vector<string> temp;
+
+		for (int j = 0; j < order.size(); j++)
 		{
-			if (!columnSet)
+			cout << order[j]<<"\n";
+			if (order[j] == -1)
 			{
-				columns.push_back(it);
+				temp.push_back("NULL");
 			}
 			else
 			{
-				values.push_back(it);
+				temp.push_back(row[order[j] + (cnt * columns.size())]);
 			}
 		}
-		count = count + 1;
+		current_table.Insert(temp);
 	}
 
-	if (values.size() % columns.size() != 0)
-	{
-		cout << "INSERT INTO function is formatted wrong!\n";
-		return;
-	}
-	else
-	{
-
-		int row_count = values.size() / columns.size();
-		vector<string> row_entry;
-		vector<string> col_names = current_table.get_column_names();
-
-		vector<int> order;
-
-		for (int i = 0; i < columns.size(); i++)
-		{
-			auto itr = std::find(columns.begin(), columns.end(), col_names.at(i));
-			if (itr != columns.cend())
-			{
-
-				order.push_back((std::distance(columns.begin(), itr)));
-			}
-			else
-			{
-				order.push_back(-1);
-			}
-		}
-
-		for (int i = 0; i < row_count; i++)
-		{
-			vector<string> temp;
-
-			for (int j = 0; j < order.size(); j++)
-			{
-				cout << order[j]<<"\n";
-				if (order[j] == -1)
-				{
-					temp.push_back("NULL");
-				}
-				else
-				{
-					temp.push_back(values[order[j] + (i * columns.size())]);
-				}
-			}
-			current_table.Insert(temp);
-		}
-		SaveTable(current_table);
-	}
+	SaveTable(current_table);
+	
 	cout << "Inserted values in rows!"
 		 << "\n";
 }

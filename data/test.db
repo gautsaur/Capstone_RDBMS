@@ -4,6 +4,8 @@ keys:id p,o_id f,ot_id f
 columns:id int,name string
 row:1,test 1
 row:2,test 2
+row:3,Amanda Hernandez
+row:NULL,NULL
 ;
 table_name:other_table
 keys:id p,o_id f

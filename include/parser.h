@@ -118,7 +118,7 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	vector<string> ret;
 
 	//regex str_expr("insert into " + table_name + " \\((.*)\\)", regex::icase);
-	regex str_expr(R"(insert into " + table_name + "(?:\s*\()(.*)\)(?:\s*)values)", regex::icase);
+	regex str_expr("(insert into " + table_name + "(?:\\s*\\()(.*)\\)(?:\\s*)values)", regex::icase);
 
 	// Check if the match was found, and add to the vector
 	if(regex_search(cmd, sm, str_expr)){
@@ -180,6 +180,8 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 	} else {
 		cout << "Insert Rows: No Match!" << endl;
 	}
+
+	cout << "Finished Insert Parse" << endl;
 
 	return ret;
 }

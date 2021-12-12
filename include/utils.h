@@ -71,4 +71,14 @@ namespace Utils {
 		
 	}
 	
+	std::string get_string_between_two_strings(const std::string str, const std::string start, const std::string end)
+	{
+		signed first_delim_pos = str.find(start);
+	    unsigned end_pos_of_first_delim = first_delim_pos + start.length();
+	    unsigned last_delim_pos = str.find(end);
+	 
+	    return trim(str.substr(end_pos_of_first_delim,
+	            last_delim_pos - end_pos_of_first_delim));
+	}
+	
 }// http://programmingnotes.org/

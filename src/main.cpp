@@ -163,6 +163,16 @@ int main(int argc, char **argv)
             std::string tbl_name = table_name = Utils::split(statement, " \n")[1];
             vector<vector<string> > columns = Parser::get_update_clause(statement);
 
+            std::cout << columns.size() << std::endl;
+            for (int i = 0; i < columns.size(); i++)
+            {
+                for (int j = 0; j < columns[i].size(); j++)
+                {
+                     std::cout << columns[i][j] << " ";
+            }
+            std::cout << std::endl;
+            }
+
         }
 		else if (statement.find("delete from ") == 0)
 		{
@@ -296,9 +306,8 @@ void color(int s)
 }
 
 
-//Janita Aamir
-//mm-dd-yy
-//This function updates an existing value with a new one given the column names and specific row.
+///Author: Janita Aamir
+///This function updates an existing value with a new one given the column names and specific row.
 //UPDATE [table_name] set Name = "new name" WHERE ID = 1;
 void update_table(Database *db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable){
     Table tbl = db->get_table(table_name);
@@ -345,7 +354,7 @@ void update_table(Database *db, std::string table_name, std::string col1, std::s
 //     }
 // }
 
-/// Author: Saurav Gautam
+/// Author: Janita Aamir
 /// Creates a table with given column info
 Table *create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info)
 {
@@ -357,9 +366,8 @@ Table *create_table(std::string table_name, std::vector<pair<std::string, std::s
 	return tbl;
 }
 
-//Janita Aamir
-//Date: mm-dd-yy
-//This function drops the given table from the current database.
+///Author: Janita Aamir
+///This function drops the given table from the current database.
 void drop_table(Database *db, Table* tbl){
     tbl->Delete();
 
@@ -374,6 +382,8 @@ void drop_table(Database *db, Table* tbl){
     db->Save();
 }
 
+///Author: Janita Aamir
+///This function drops the given database from the dbms.
 void drop_database(string db_name)
 {
 
@@ -391,7 +401,7 @@ void drop_database(string db_name)
 	}
 }
 
-/// Author: ?????, Saurav Gautam
+/// Author: Janita Aamir, Saurav Gautam
 /// Shows the given table information
 /// Table Name, Column Names, Number of Rows
 void table_info(Table tbl)
@@ -411,10 +421,9 @@ void table_info(Table tbl)
 	std::cout << "Number of Rows: " << tbl.rows.size() << std::endl;
 }
 
-//Janita Aamir
-//Date: mm-dd-yy
-//This function is used within create table. It checks to see if the
-//database selected has any special characters that aren't allowed.
+///Janita Aamir
+///This function is used within create table. It checks to see if the
+///database selected has any special characters that aren't allowed.
 bool has_special_char(std::string const &s)
 {
 	for (int i = 0; i < s.length(); i++)

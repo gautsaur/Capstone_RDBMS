@@ -38,31 +38,31 @@ vector<vector<string> > Parser::get_update_clause(string cmd) {
 	smatch sm;
 	vector<vector<string> > ret;
 	vector<string> values;
-		
+
 	regex str_expr("set(?:\\s*)(.*)(?:\\s*where)");
-	
+
 	if(regex_search(cmd, sm, str_expr)){
 		try
-		{			
+		{
 			values = Utils::split(sm[1], ",");
-			
+
 			for(string value : values) {
 				vector<string> temp = Utils::split("=");
-				
+
 				ret.push_back(temp);
-				
+
 			}
-			
+
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}
-		
+
 	} else {
 		cout << "No Match!" << endl;
 	}
-			
+
 	return ret;
-	
+
 }
 
 /// Author: Andrew
@@ -72,9 +72,9 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 	smatch sm;
 	vector<string> ret;
 	vector<string> tmp;
-		
+
 	regex str_expr("where (.*)");
-	
+
 	if(regex_search(cmd, sm, str_expr)){
 		try
 		{		
@@ -87,11 +87,11 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}
-		
+
 	} else {
 		cout << "No Match!" << endl;
 	}
-			
+
 	return ret;
 }
 
@@ -136,12 +136,8 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	} else {
 		cout << "Insert Columns: No Match!" << endl;
 	}
-	
-	return ret;
-}
 
-vector<string> get_delete_clause(string cmd, string op) {
-	
+	return ret;
 }
 
 string Parser::get_conditional(string stm) {
@@ -177,19 +173,19 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 		try
 		{		
 			vector<string> rows = Utils::split(sm[1], ")(");
-			
+
 			for(string row : rows){
 				row = Utils::remove_char(row, '\'');
 				row = Utils::remove_char(row, '"');
-				
+
 				vector<string> values = Utils::split(row, ",");
-				
-				if(values.size() > 0){					
+
+				if(values.size() > 0){
 					ret.push_back(values);
 				}
-				
+
 			}
-			
+
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}

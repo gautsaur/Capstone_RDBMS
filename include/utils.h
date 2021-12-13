@@ -37,6 +37,9 @@ namespace Utils {
         return results;
     }
     
+    /// Author: Andrew Nunez
+	/// Save the table after being updated in the console
+	/// Replaces the table by creating a new one
     std::string remove_char(std::string str, char delim)
 	{
 	    str.erase(std::remove(str.begin(), str.end(), delim), str.end());
@@ -44,22 +47,34 @@ namespace Utils {
 	    return str;
 	}
     
+    /// Author: Andrew Nunez
+	/// Save the table after being updated in the console
+	/// Replaces the table by creating a new one
 	std::string ltrim(const std::string &s)
 	{
 	    size_t start = s.find_first_not_of(WHITESPACE);
 	    return (start == std::string::npos) ? "" : s.substr(start);
 	}
 	 
+	 /// Author: Andrew Nunez
+	/// Save the table after being updated in the console
+	/// Replaces the table by creating a new one
 	std::string rtrim(const std::string &s)
 	{
 	    size_t end = s.find_last_not_of(WHITESPACE);
 	    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
 	}
 	 
+	 /// Author: Andrew Nunez
+	/// Save the table after being updated in the console
+	/// Replaces the table by creating a new one
 	std::string trim(const std::string &s) {
 	    return rtrim(ltrim(s));
 	}	
 	
+	/// Author: Andrew Nunez
+	/// Save the table after being updated in the console
+	/// Replaces the table by creating a new one
 	bool contains(std::string str, std::string subStr){
 		bool ret = false;
 		
@@ -71,6 +86,9 @@ namespace Utils {
 		
 	}
 	
+	/// Author: Andrew Nunez
+	/// Save the table after being updated in the console
+	/// Replaces the table by creating a new one
 	std::string get_string_between_two_strings(const std::string str, const std::string start, const std::string end)
 	{
 		signed first_delim_pos = str.find(start);
@@ -81,4 +99,4 @@ namespace Utils {
 	            last_delim_pos - end_pos_of_first_delim));
 	}
 	
-}// http://programmingnotes.org/
+}

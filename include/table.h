@@ -37,7 +37,7 @@ class Table {
 		
 		int GetLargestColumnSize();
 		
-		void DeleteRow(int index);
+		void DeleteRow(vector<string> row);
 		
 		int get_column_index(std::string column_name);
 		
@@ -222,13 +222,15 @@ void Table::Delete() {
 std::vector<std::string> Table::get_column_names(){
     std::vector<std::string> temp;
     auto iter = columns.begin();
-    while (iter != columns.end()) {
+        
+    while (iter != columns.end()) {    	
         temp.push_back(iter -> first);
 		iter++;
     }
+        
     return temp;
 }
 
-void Table::DeleteRow(int index){
-	rows.erase(rows.begin() + index);
+void Table::DeleteRow(vector<string> row){
+	rows.erase(std::remove(rows.begin(), rows.end(), row), rows.end());
 }

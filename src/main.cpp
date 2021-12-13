@@ -160,89 +160,74 @@ int main(int argc, char **argv)
 		} else if (statement.find("update ") == 0) {
             //UPDATE [table_name] set Name = "new name" WHERE ID = 1;
             //update_table(db, table_name, col1Name, newValue, col2Name, forValue);
+            std::string tbl_name = table_name = Utils::split(statement, " \n")[1];
+            vector<vector<string> > columns = Parser::get_update_clause(statement);
 
         }
 		else if (statement.find("delete from ") == 0)
 		{
-			vector<string> splitTexts = split_text(statement, " (),'");
-
-			if (splitTexts[0] != "delete" && splitTexts[1] != "from")
+			string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
+			
+			int count = 0;
+			string conditional = Parser::get_conditional(statement);
+			vector<string> clause = Parser::get_where_clause(statement, conditional);
+			string value = clause[1];
+			Table currentTable = db->get_table(tbl_name);
+			int col_ndx = currentTable.get_column_index(clause[0]);
+			vector<vector<string> > rows = currentTable.rows;
+			for (vector<string> row : rows)
 			{
-				continue;
-			}
-			else
-			{
-				string conditional = splitTexts[4];
-				string value = splitTexts[5];
-				Table currentTable = db->get_table(splitTexts[2]);
-				int col_ndx = currentTable.get_column_index(splitTexts[3]);
-				int row_len = currentTable.rows.size();
-				for (int i = 0; i < row_len; i++)
-				{
-					if(conditional == "="){					
-						if (currentTable.rows[i][col_ndx] == value)
-						{
-							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
-						}
-					}else if(conditional ==">="){
-						if (currentTable.rows[i][col_ndx] >= value)
-						{
-							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
-						}
+				cout << row[col_ndx] << conditional << value << endl;
+				
+				if(conditional == "="){					
+					if (row[col_ndx] == value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
 					}
-					else if(conditional =="<="){
-						if (currentTable.rows[i][col_ndx] <= value)
-						{
-							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
-						}
-					}
-					else if(conditional ==">"){
-						if (currentTable.rows[i][col_ndx] > value)
-						{
-							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
-						}
-					}
-					else if(conditional =="<"){
-						if (currentTable.rows[i][col_ndx] < value)
-						{
-							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
-						}
-					}else if(conditional =="!="){
-						if (currentTable.rows[i][col_ndx] != value)
-						{
-							currentTable.rows.erase(currentTable.rows.begin() + col_ndx);
-						}
-						else
-						{
-							std::cout << "No such value for WHERE clause." << std::endl;
-						}
-					}else{
-						std::cout << "Given conditional statement is not supported!" << std::endl;
+				}else if(conditional ==">="){
+					if (row[col_ndx] >= value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
 					}
 				}
-				db->SaveTable(currentTable);
+				else if(conditional =="<="){
+					if (row[col_ndx] <= value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
+				}
+				else if(conditional ==">"){
+					if (row[col_ndx] > value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
+				}
+				else if(conditional =="<"){
+					if (row[col_ndx] < value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
+				}else if(conditional =="!="){
+					if (row[col_ndx] != value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
+				}else{
+					std::cout << "Given conditional statement is not supported!" << std::endl;
+				}
 			}
+			
+			db->SaveTable(currentTable);
+			
 			db->Save();
+			
+			std::cout << count << " rows deleted." << endl;
 		}
 		else
 		{

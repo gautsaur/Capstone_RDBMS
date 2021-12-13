@@ -13,12 +13,13 @@ class Parser {
 		vector<string> static get_select_columns(string cmd);
 		static string* split_str(std::string str, char delim);
 		vector<string> static get_create_columns(string cmd);
-		vector<array<string, 3> > get_where_clause(string cmd);
+		vector<string> static get_where_clause(string cmd, string op);
         vector<string> split_text(string input, string delimeter);
         vector<string> static get_insert_columns(string cmd, string table_name);
         vector<vector<string> > static get_insert_rows(string cmd, string table_name);
         std::string static to_lower(std::string s);
-        vector<vector<string> > get_update_clause(string cmd);
+        vector<vector<string> > static get_update_clause(string cmd);
+        string static get_conditional(string stm);
 };
 
 /// Converts a string to lower
@@ -67,19 +68,21 @@ vector<vector<string> > Parser::get_update_clause(string cmd) {
 /// Author: Andrew
 /// Date: 11-28-2021
 /// Get's the where clause parameters for a select or update statement
-vector<array<string, 3> > Parser::get_where_clause(string cmd) {
+vector<string> Parser::get_where_clause(string cmd, string op) {
 	smatch sm;
-	vector<array<string, 3> > ret;
+	vector<string> ret;
 	vector<string> tmp;
 		
 	regex str_expr("where (.*)");
 	
 	if(regex_search(cmd, sm, str_expr)){
 		try
-		{
-			cout << sm[1] << endl;
+		{		
+			tmp = Utils::split(Utils::remove_char(sm[1], ';'), op);
 			
-			tmp = Utils::split(sm[1], ",");
+			for(string str : tmp) {
+				ret.push_back(Utils::trim(str));
+			}
 			
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
@@ -124,18 +127,36 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	if(regex_search(cmd, sm, str_expr)){
 		try
 		{
-			ret = Utils::split(sm[1], ",");
-			
-			for(int i = 0; i < sm.size(); i += 1){
-				cout << "Column Group:\t" << sm[i] << endl;
-			}
-
+			ret = Utils::split(sm[sm.size() - 1], ",");
+					
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}
 
 	} else {
 		cout << "Insert Columns: No Match!" << endl;
+	}
+	
+	return ret;
+}
+
+vector<string> get_delete_clause(string cmd, string op) {
+	
+}
+
+string Parser::get_conditional(string stm) {
+	string ret = "";
+	
+	if(Utils::contains(stm, "<=")) {
+		ret = "<=";
+	} else if(Utils::contains(stm, ">=")) {
+		ret = ">=";
+	} else if(Utils::contains(stm, "=")) {
+		ret = "=";
+	} else if(Utils::contains(stm, "<")) {
+		ret = "<";
+	} else if(Utils::contains(stm, ">")) {
+		ret = ">";
 	}
 	
 	return ret;
@@ -154,11 +175,7 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 	// Check if the match was found, and add to the vector
 	if(regex_search(cmd, sm, str_expr)){
 		try
-		{			
-			for(int i = 0; i < sm.size(); i += 1){
-				cout << "Row Group:\t" << sm[i] << endl;
-			}
-		
+		{		
 			vector<string> rows = Utils::split(sm[1], ")(");
 			
 			for(string row : rows){
@@ -180,8 +197,6 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 	} else {
 		cout << "Insert Rows: No Match!" << endl;
 	}
-
-	cout << "Finished Insert Parse" << endl;
 
 	return ret;
 }

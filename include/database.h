@@ -394,7 +394,6 @@ void Database::SaveTable(Table table)
 /// Read the insert statement and insert values in the table
 void Database::insert_into(std::string statement, std::string table_name)
 {
-	cout << "Beginning Insert for:" << table_name << ";" << endl;
 	Table current_table = get_table(table_name);;
 	vector<string> columns = Parser::get_insert_columns(statement, table_name);
 	vector<vector<string> > values = Parser::get_insert_rows(statement, table_name);	
@@ -403,25 +402,17 @@ void Database::insert_into(std::string statement, std::string table_name)
 
 	vector<int> order;
 
-	cout << "Beginning Column sorting" << endl;
-
-	for (int i = 0; i < columns.size(); i++)
-	{
-		auto itr = std::find(columns.begin(), columns.end(), col_names.at(i));
-		if (itr != columns.cend())
-		{
-
-			order.push_back((std::distance(columns.begin(), itr)));
-		}
-		else
-		{
+	for(string str : col_names) {
+		auto it = std::find(columns.begin(), columns.end(), str);
+						
+		if(it != columns.end()) {
+			order.push_back(std::distance(columns.begin(), it));
+		} else {			
 			order.push_back(-1);
 		}
 	}
 
 	int cnt = 0;
-
-	cout << "Done. Beginning row Sorting" << endl;
 
 	for(vector<string> row : values)
 	{
@@ -429,16 +420,18 @@ void Database::insert_into(std::string statement, std::string table_name)
 
 		for (int j = 0; j < order.size(); j++)
 		{
-			cout << order[j]<<"\n";
 			if (order[j] == -1)
 			{
 				temp.push_back("NULL");
 			}
 			else
 			{
-				temp.push_back(row[order[j] + (cnt * columns.size())]);
+				temp.push_back(Utils::trim(row[order[j]]));
 			}
 		}
+		
+		cnt += 1;
+		
 		current_table.Insert(temp);
 	}
 

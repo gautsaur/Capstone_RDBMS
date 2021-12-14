@@ -1,0 +1,7 @@
+database:TestDBSaurav
+table_name:Customers
+columns:City string,Country string,CustomerName string
+row:Stavanger,Norway,Cardinal
+row:Idaho Falls,NULL,NULL
+row:Pocatello,USA,Timothy
+;

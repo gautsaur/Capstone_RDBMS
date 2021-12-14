@@ -1,0 +1,48 @@
+database:PartsSupplier
+table_name:Supplier
+columns:City VARCHAR,Country VARCHAR,State VARCHAR,Status INT,SupplierId INT,SupplierName VARCHAR
+row:London,England,United Kingdom,20,1,Smith
+row:Paris,France,Ile de France,10,2,Jones
+row:Paris,France,Ile de France,30,3,Blake
+row:London,England,United Kingdom,20,4,Clark
+row:Athens,Greece,Attica,10,5,Adams
+row:Walla Walla,United States,Washington,42,7,Wacky
+;
+table_name:Project
+columns:ProjectId INT,ProjectName VARCHAR
+row:1,Sorter
+row:2,Punch
+row:3,Reader
+row:4,Console
+row:5,Collator
+row:6,Terminal
+row:7,Tape
+;
+table_name:Part
+columns:Color VARCHAR,PartId INT,PartName VARCHAR,Weight INT
+row:Red,1,Nut,12
+row:Green,2,Bolt,17
+row:Blue,3,Screw,17
+row:Red,4,Screw,14
+row:Blue,5,Cam,12
+row:Red,6,Cog,19
+row:Red,7,Widgets,42
+;
+table_name:Shipment
+columns:PartId INT,ProjectId INT,Quantity INT,ShipmentId INT,SupplierId INT
+row:1,1,200,1,1
+row:1,4,300,2,1
+row:3,1,300,3,2
+row:3,2,200,4,2
+row:3,3,500,5,2
+row:3,4,500,6,2
+row:3,5,230,7,2
+row:3,6,210,8,2
+row:5,7,110,9,2
+row:2,2,250,10,3
+row:4,1,270,11,3
+row:6,2,600,12,4
+row:6,3,200,13,4
+row:2,1,200,14,5
+row:7,6,1,15,6
+;

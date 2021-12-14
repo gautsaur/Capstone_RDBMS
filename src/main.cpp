@@ -54,8 +54,6 @@ int main(int argc, char **argv)
 		std::getline(std::cin, cmd);
 		std::string statement = Parser::to_lower(cmd);
 
-		// SELECT [ID, TEST, ] FROM TABLE;
-
 		// Do something with cmd
 		if (statement == "exit")
 		{
@@ -68,7 +66,8 @@ int main(int argc, char **argv)
 		} else if(statement.back() != ';') {
 			std::cout << "SQL command not properly terminated." << std::endl;
 		} else if(statement.find("open database ") == 0){
-			current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+			//current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
+			current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
 		 	db = new Database(current_db_name);
 
 			if(db->database_name != current_db_name){
@@ -79,21 +78,28 @@ int main(int argc, char **argv)
 		    current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 			db = new Database();
 			db->database_name = current_db_name;
+			db->Save();
 
 		} else if (statement == "list databases;") {
 			Database::List();
-		}
-		else if (statement == "list tables;")
-		{
-			if (current_db_name.length() == 0)
-			{
-				std::cout << "Open a database first." << std::endl;
-			}
-			else
-			{
-				db->List_Tables();
-			}
+		} else if (statement.find("load sqlfile ") == 0) {
+			string target_file_path = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+			db = read_sql_file(target_file_path);
+			
+			current_db_name = db->database_name;
+			
+			cout << "Database Created: " << current_db_name << endl;
+		} else if (statement.find("drop database ") == 0) {
+			string db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+			//db = new Database(current_db_name);
+			drop_database(db_name);
+		} else if (current_db_name.length() == 0) {
+			std::cout << "Open a database first." << std::endl;
+		} else if (statement == "list tables;")	{			
+			db->List_Tables();
 
+		} else if(statement == "db info;") {
+			db->List_Info();
 		} else if (statement.find("select ") == 0) {
 			// Parses the select command
 			try	{
@@ -104,13 +110,12 @@ int main(int argc, char **argv)
 
 				Table tbl = db->get_table(tbl_name);
 
-				cout << "Selecting from " << tbl_name << endl;
-
 				if (tbl.table_name.length() > 0)
 				{
 					std::vector<std::string> cols = Parser::get_select_columns(cmd);
-					//Parser::get_where_clause(cmd);
-					tbl.Print_Rows(cols);
+					std::string conditional = Parser::get_conditional(cmd);
+					std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
+					tbl.Print_Rows(cols, where_clause, conditional);
 				}
 				else
 				{
@@ -120,43 +125,27 @@ int main(int argc, char **argv)
 			catch (const std::exception &)
 			{
 			}
-		}
-		else if (statement.find("create table ") == 0)
-		{
-			table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-			Table *tbl = new Table(table_name);
+		} else if (statement.find("create table ") == 0) {
+			//table_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "table", "("));
+			table_name = Parser::get_table_name(cmd, "table", "(");
+			vector<string> cols = Parser::get_create_columns(cmd);
+			Table *tbl = new Table(table_name, cols);
 			db->AddTable(*tbl);
-		}
-		else if (statement.find("insert into") == 0)
-		{
+		} else if (statement.find("insert into") == 0) {
 			//table_name = Utils::trim(cmd.substr(cmd.find("into ") + 5, cmd.find_first_of('(') - cmd.find("into ") + 5));
-			table_name = Utils::get_string_between_two_strings(cmd, "into ", "(");
+			//table_name = Utils::get_string_between_two_strings(cmd, "into ", "(");
+			table_name = Parser::get_table_name(statement, "into", "(");
 			db->insert_into(cmd, table_name);
 			db->Save();
-		}
-		else if (statement.find("table info ") == 0)
-		{
+		} else if (statement.find("table info ") == 0) {
 
 			table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 			Table tbl = db->get_table(table_name);
 			table_info(tbl);
-		}
-		else if (statement.find("drop table ") == 0)
-		{
+		} else if (statement.find("drop table ") == 0) {
 			string table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 			db->DropTable(table_name);
 			db->Save();
-		}
-		else if (statement.find("drop database ") == 0)
-		{
-			string db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-			//db = new Database(current_db_name);
-			drop_database(db_name);
-		}
-		else if (statement.find("load sqlfile ") == 0)
-		{
-			string target_file_path = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-			db = read_sql_file(target_file_path);
 		} else if (statement.find("update ") == 0) {
             //UPDATE [table_name] set Name = "new name" WHERE ID = 1;
             //update_table(db, table_name, col1Name, newValue, col2Name, forValue);
@@ -173,9 +162,7 @@ int main(int argc, char **argv)
             std::cout << std::endl;
             }
 
-        }
-		else if (statement.find("delete from ") == 0)
-		{
+        } else if (statement.find("delete from ") == 0) {
 			string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
 			
 			int count = 0;
@@ -185,8 +172,7 @@ int main(int argc, char **argv)
 			Table currentTable = db->get_table(tbl_name);
 			int col_ndx = currentTable.get_column_index(clause[0]);
 			vector<vector<string> > rows = currentTable.rows;
-			for (vector<string> row : rows)
-			{
+			for (vector<string> row : rows) {
 				cout << row[col_ndx] << conditional << value << endl;
 				
 				if(conditional == "="){					
@@ -248,19 +234,13 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-std::string remove_char(std::string str, char delim)
-{
-	str.erase(std::remove(str.begin(), str.end(), delim), str.end());
-
-	return str;
-}
-
 /// Shows the help menu
 void show_help()
 {
 	std::cout << "Available Commands:" << std::endl;
 	std::cout << "OPEN DATABASE [name] 	- Check if the database exists and open it." << std::endl;
 	std::cout << "CREATE DATABASE 	- Creates and new database and opens a connection to it." << std::endl;
+	std::cout << "DB INFO 		- Lists the current database names." << std::endl;
 	std::cout << "DROP DATABASE 		- Deletes the given database." << std::endl;
 	std::cout << "CREATE TABLE 		- Creates a table in the current database." << std::endl;
 	std::cout << "DROP TABLE [name] 	- Creates a table in the current database." << std::endl;
@@ -272,6 +252,7 @@ void show_help()
 	std::cout << "LIST DATABASES 		- Lists the current database names." << std::endl;
 	std::cout << "LIST TABLES 		- Lists the current database names." << std::endl;
 	std::cout << "TABLE INFO [name] 	- Lists the current database names." << std::endl;
+	
 	// List Tables
 	// Display Schema
 }
@@ -328,31 +309,6 @@ void update_table(Database *db, std::string table_name, std::string col1, std::s
 
 
 }
-
-//Janita Aamir
-//Date: mm-dd-yy
-//This function creates a new table within the current database and accepts a set of column names with types.
-// Table* create_table(Database *db, std::string table_name, std::vector<std::string> columns){
-
-//     if (!current_db_name.empty() && has_special_char(current_db_name)!= true){
-//             if (db->find_table(table_name) != true ){
-
-//             Table *tbl = new Table(table_name);
-
-//             for (string i: columns){
-
-// 				vector<string> pr = Utils::split(i, " ");
-
-// 				if(pr.size() > 1){
-// 					tbl->columns.insert({pr[0], pr[1]});
-// 				}
-
-//             }
-
-//             return tbl;
-//         }
-//     }
-// }
 
 /// Author: Janita Aamir
 /// Creates a table with given column info
@@ -449,66 +405,28 @@ Database *read_sql_file(string path)
 	string current_db_name;
 	Database *db = new Database();
 
-	for (auto &statement : commands)
+	for (string statement : commands)
 	{
-		string statement_lowercase = statement;
-		std::for_each(statement_lowercase.begin(), statement_lowercase.end(), [](char &c)
-					  { c = ::tolower(c); });
+		string statement_lowercase = Parser::to_lower(Utils::trim(statement));
 
 		if (statement_lowercase.find("create database") == 0)
 		{
 			current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
 			db->database_name = current_db_name;
-			cout << "Created datbase: " << current_db_name << "\n";
 		}
-		else if (statement_lowercase.find("create table") == 0)
+		else if (statement_lowercase.find("create table ") == 0)
 		{
-			vector<string> splitTexts = split_text(statement, " (),'");
-			vector<pair<string, string>> read_columns;
-			string datatype_key = "";
-			string columnName_value = "";
-			int count = 0;
-			for (auto &it : splitTexts)
-			{
-				string it_lowercase = it;
-				std::for_each(it_lowercase.begin(), it_lowercase.end(), [](char &c)
-							  { c = ::tolower(c); });
-
-				if (count == 2)
-				{
-					table_name = it;
-				}
-				if (count > 2)
-				{
-					if (count % 3 == 0)
-					{
-						columnName_value = it;
-					}
-					if (count % 3 == 1)
-					{
-						if (it_lowercase == "int")
-						{
-							datatype_key = "int";
-						}
-						else
-						{
-							datatype_key = "string";
-						}
-
-						read_columns.push_back(make_pair(columnName_value, datatype_key));
-						count = 2;
-					}
-				}
-				count = count + 1;
-			}
-
-			Table *tbl = create_table(table_name, read_columns);
+			table_name = Parser::get_table_name(statement, "table", "(");
+			cout << "Table Created: " << table_name << endl;
+			vector<string> cols = Parser::get_create_columns(statement);
+			Table *tbl = new Table(table_name, cols);
 			db->AddTable(*tbl);
-			cout << "Created table: " << table_name << "\n";
 		}
 		else if (statement_lowercase.find("insert into") == 0)
 		{
+			table_name = Parser::get_table_name(statement, "into", "(");
 			db->insert_into(statement, table_name);
+			db->Save();
 		}
 	}
 	db->Save();

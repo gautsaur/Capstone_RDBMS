@@ -3,7 +3,12 @@ table_name:test_table
 keys:id p,o_id f,ot_id f
 columns:id int,name string
 row:1,Axe
-row:2,Chainsaw
+row:2,NULL
+row:3,NULL
+row:4,Hammer
+row:5,Nail
+row:6,Screw
+row:7,Drill
 ;
 table_name:other_table
 keys:id p,o_id f
@@ -13,4 +18,5 @@ row:2,test 2,active
 ;
 table_name:testing
 columns:id int,name varchar
+row:1,NULL
 ;

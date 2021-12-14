@@ -5,6 +5,7 @@
 #include <regex>
 #include <bits/stdc++.h>
 #include "utils.h"
+#include <iomanip>
 using namespace std;
 
 class Parser {
@@ -20,6 +21,7 @@ class Parser {
         std::string static to_lower(std::string s);
         vector<vector<string> > static get_update_clause(string cmd);
         string static get_conditional(string stm);
+        string static get_table_name(string cmd, string first_delim, string second_delim);
 };
 
 /// Converts a string to lower
@@ -38,31 +40,31 @@ vector<vector<string> > Parser::get_update_clause(string cmd) {
 	smatch sm;
 	vector<vector<string> > ret;
 	vector<string> values;
-
+		
 	regex str_expr("set(?:\\s*)(.*)(?:\\s*where)");
-
+	
 	if(regex_search(cmd, sm, str_expr)){
 		try
-		{
+		{			
 			values = Utils::split(sm[1], ",");
-
+			
 			for(string value : values) {
 				vector<string> temp = Utils::split("=");
-
+				
 				ret.push_back(temp);
-
+				
 			}
-
+			
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}
-
+		
 	} else {
 		cout << "No Match!" << endl;
 	}
-
+			
 	return ret;
-
+	
 }
 
 /// Author: Andrew
@@ -72,9 +74,9 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 	smatch sm;
 	vector<string> ret;
 	vector<string> tmp;
-
+		
 	regex str_expr("where (.*)");
-
+	
 	if(regex_search(cmd, sm, str_expr)){
 		try
 		{		
@@ -87,11 +89,9 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}
-
-	} else {
-		cout << "No Match!" << endl;
+		
 	}
-
+			
 	return ret;
 }
 
@@ -119,15 +119,20 @@ std::string* Parser::split_str(std::string str, char delim){
 vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	smatch sm;
 	vector<string> ret;
+	vector<string> tmp;
 
 	//regex str_expr("insert into " + table_name + " \\((.*)\\)", regex::icase);
-	regex str_expr("(insert into " + table_name + "(?:\\s*\\()(.*)\\)(?:\\s*)values)", regex::icase);
+	regex str_expr(table_name + "(?:\\s*\\()(.*)\\)(?:\\s*)values", regex::icase);
 
 	// Check if the match was found, and add to the vector
 	if(regex_search(cmd, sm, str_expr)){
 		try
 		{
-			ret = Utils::split(sm[sm.size() - 1], ",");
+			tmp = Utils::split(sm[sm.size() - 1], ",");
+			
+			for(string str : tmp) {
+				ret.push_back(Utils::trim(str));
+			}
 					
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
@@ -136,10 +141,13 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	} else {
 		cout << "Insert Columns: No Match!" << endl;
 	}
-
+	
 	return ret;
 }
 
+/// Author: Andrew
+/// Date: 12-12-2021
+/// Gets the conditional statement from a command
 string Parser::get_conditional(string stm) {
 	string ret = "";
 	
@@ -173,19 +181,19 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 		try
 		{		
 			vector<string> rows = Utils::split(sm[1], ")(");
-
+			
 			for(string row : rows){
 				row = Utils::remove_char(row, '\'');
 				row = Utils::remove_char(row, '"');
-
+				
 				vector<string> values = Utils::split(row, ",");
-
-				if(values.size() > 0){
+				
+				if(values.size() > 0){					
 					ret.push_back(values);
 				}
-
+				
 			}
-
+			
 		} catch(const std::exception& e) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}
@@ -216,8 +224,6 @@ vector<string> Parser::get_select_columns(string cmd) {
 			std::cout << "Exception: " << e.what() << std::endl;
 		}
 
-	} else {
-		cout << "No Match!" << endl;
 	}
 
 	return ret;
@@ -226,7 +232,7 @@ vector<string> Parser::get_select_columns(string cmd) {
 
 /// Author: Andrew
 /// Date: 10-28-2021
-/// Splits the provided string on the specified delimiter
+/// Gets the columns for create table command
 vector<string> Parser::get_create_columns(string cmd) {
 	smatch sm;
 	vector<string> ret;
@@ -244,11 +250,41 @@ vector<string> Parser::get_create_columns(string cmd) {
 		}
 
 	} else {
-		cout << "Create Columns: No Match!" << endl;
+		cout << "Invalid Command. Can't find Columns." << endl;
 	}
 
 	return ret;
 
+}
+
+std::string Parser::get_table_name(string cmd, string first_delim, string second_delim) {
+	smatch sm;
+	std::string ret;
+	string exp = "";
+	
+	if(second_delim == "(") {
+		exp = first_delim + "(?:\\s*)([A-Za-z\\-_]*)(?:\\s*)\\(";
+	} else {
+		exp = first_delim + "(?:\\s*)([A-Za-z\\-_]*)(?:\\s*)" + second_delim;
+	}
+	
+	regex str_expr(exp, regex_constants::icase);
+
+	// Check if the match was found, and add to the vector
+	if(regex_search(cmd, sm, str_expr)){
+		try
+		{			
+			ret = Utils::trim(sm[1]);
+
+		} catch(const std::exception& e) {
+			std::cout << "Exception: " << e.what() << std::endl;
+		}
+
+	} else {
+		cout << "Invalid Command. Can't find table name." << endl;
+	}
+
+	return ret;
 }
 
 std::vector<std::string> split_text(std::string input, std::string delimeter)

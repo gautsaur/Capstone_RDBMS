@@ -19,33 +19,21 @@ private:
 public:
 	/// The name of the database
 	std::string database_name;
-
 	/// The collection of tables
 	std::vector<Table> tables;
 
 	static void List();
-
 	void List_Tables();
-
 	void AddTable(Table &tbl);
-
 	void Delete();
-
 	void Save();
-
 	void SaveTable(Table table);
 	void DropTable(std::string name);
-
 	void CreateTable(std::string tableName);
-
 	bool find_table(std::string name);
-
-	void insert_into_table(string table_name, vector<string> cols, vector<vector<string>> data);
-
 	void insert_into(std::string statement, std::string table_name);
-
+	void List_Info();
 	Table get_table(std::string tbl_name);
-
 
 	// Base constructor database
 	Database()
@@ -134,6 +122,8 @@ void Database::Save()
 void Database::AddTable(Table &tbl)
 {
 	tables.push_back(tbl);
+	
+	this->Save();
 }
 
 void Database::DropTable(std::string name)
@@ -267,88 +257,6 @@ bool Database::find_table(std::string name)
 	}
 }
 
-void Database::insert_into_table(string table_name, vector<string> cols, vector<vector<string>> data)
-{
-	for (Table tbl : tables)
-	{
-		if (tbl.table_name == table_name)
-		{
-			// Begin Insert
-			string message;
-
-			vector<int> indexes;
-
-			for (vector<string> row : data)
-			{
-				if (row.size() != tbl.columns.size())
-				{
-					message = "Row count does not match column count.";
-				}
-			}
-
-			if (message.length() <= 0)
-			{
-				for (string u_col : cols)
-				{
-					string col = Utils::trim(u_col);
-					int index = tbl.get_column_index(col);
-
-					if (index > -1)
-					{
-						indexes.push_back(index);
-					}
-					else
-					{
-						message = "Invalid column name:" + col + ";";
-					}
-				}
-			}
-
-			if (message.length() <= 0)
-			{
-				vector<string> new_row;
-
-				for (vector<string> row : data)
-				{
-					if (row.size() == tbl.columns.size())
-					{
-						new_row = row;
-					}
-					else
-					{
-						int current_index = 0;
-
-						for (int index : indexes)
-						{
-
-							while (current_index < index)
-							{
-								new_row.push_back("NULL");
-
-								current_index += 1;
-							}
-
-							new_row.push_back(Utils::trim(row[current_index]));
-
-							current_index += 1;
-						}
-					}
-
-					tbl.Insert(new_row);
-				}
-
-				message = "Success!";
-
-				DropTable(table_name);
-				AddTable(tbl);
-			}
-
-			cout << message << endl;
-
-			return;
-		}
-	}
-}
 
 Table Database::get_table(std::string name)
 {
@@ -389,8 +297,27 @@ void Database::SaveTable(Table table)
 	tables[count] = table;
 }
 
+void Database::List_Info() {
+	int size = 0;
+	std::cout << "Database Name:    	" << database_name << endl;
+	std::cout << "Number of Tables: 	" << tables.size() << endl;
+	std::cout << "==========================" << endl;
+	for(Table tbl : tables) {
+		cout << ">    " << tbl.table_name << endl;
+		
+		for(vector<string> row : tbl.rows) {
+			for(string str : row){
+				size += str.length();
+			}
+		}
+		
+	}
+	std::cout << "==========================" << endl;
+	
+	std::cout << "Total Size: " << size << " bytes" << endl;
+}
 
-/// Author: Saurav Gautam
+/// Author: Saurav Gautam, Andrew Nunez
 /// Read the insert statement and insert values in the table
 void Database::insert_into(std::string statement, std::string table_name)
 {
@@ -437,6 +364,4 @@ void Database::insert_into(std::string statement, std::string table_name)
 
 	SaveTable(current_table);
 	
-	cout << "Inserted values in rows!"
-		 << "\n";
 }
